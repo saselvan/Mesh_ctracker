@@ -678,3 +678,166 @@ body {
   color: var(--primary-600);
   margin-bottom: 16px;
 }
+
+/* Profile Styles */
+.profile-modal {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  width: 100%;
+  max-width: 340px;
+  animation: scaleIn 0.2s ease;
+}
+
+.profile-empty {
+  text-align: center;
+  color: var(--gray-500);
+  padding: 20px 0;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.profile-item {
+  width: 100%;
+}
+
+.profile-select-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.125rem;
+  font-weight: 500;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--gray-700);
+}
+
+.profile-select-btn:hover {
+  background: var(--primary-100);
+  border-color: var(--primary-400);
+}
+
+.profile-pin-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-sm);
+}
+
+.profile-name {
+  font-weight: 500;
+  flex: 1;
+}
+
+.pin-input {
+  width: 60px;
+  padding: 8px;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius-sm);
+}
+
+.pin-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+}
+
+.btn--sm {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+.profile-add-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.profile-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.error-message {
+  color: var(--red-500);
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.profile-management {
+  margin-bottom: 20px;
+}
+
+.current-profile-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  margin-bottom: 12px;
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-actions .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.delete-confirm {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-sm);
+}
+
+.delete-confirm p {
+  margin-bottom: 12px;
+  color: var(--gray-600);
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-profile-name {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.btn-lock {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--gray-400);
+  transition: color 0.2s;
+}
+
+.btn-lock:hover {
+  color: var(--primary-600);
+}
+
+.profile-hint {
+  color: var(--gray-500);
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+}
