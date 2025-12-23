@@ -7,26 +7,50 @@ import { Settings } from './Settings'
 import { Modal } from './Modal'
 import { FAB } from './FAB'
 import { DatePicker } from './DatePicker'
-import { getEntriesByDate, addEntry, updateEntry, deleteEntry } from '../utils/db'
-import { getGoals, saveGoals } from '../utils/storage'
+import { ProfileSettings } from './ProfileSettings'
+import { getEntriesByDateAndProfile, addEntry, updateEntry, deleteEntry } from '../utils/db'
+import { getGoals, saveGoals, getProfiles, getActiveProfileId, setActiveProfileId, needsMigration } from '../utils/storage'
 import { getToday } from '../utils/date'
 
 export function App() {
   const [currentDate, setCurrentDate] = useState(getToday())
   const [entries, setEntries] = useState([])
-  const [goals, setGoals] = useState(getGoals())
+  const [activeProfileId, setActiveProfile] = useState(getActiveProfileId())
+  const [goals, setGoals] = useState(getGoals(activeProfileId))
   const [showForm, setShowForm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [showProfilePicker, setShowProfilePicker] = useState(false)
+  const [showMigrationPrompt, setShowMigrationPrompt] = useState(false)
   const [editingEntry, setEditingEntry] = useState(null)
   const [deletingEntry, setDeletingEntry] = useState(null)
 
+  const profiles = getProfiles()
+  const hasProfiles = profiles.length > 0
+  const currentProfile = profiles.find(p => p.id === activeProfileId)
+
+  useEffect(() => {
+    if (hasProfiles && !activeProfileId) {
+      setShowProfilePicker(true)
+    }
+  }, [hasProfiles, activeProfileId])
+
+  useEffect(() => {
+    if (needsMigration()) {
+      setShowMigrationPrompt(true)
+    }
+  }, [])
+
   useEffect(() => {
     loadEntries()
-  }, [currentDate])
+  }, [currentDate, activeProfileId])
+
+  useEffect(() => {
+    setGoals(getGoals(activeProfileId))
+  }, [activeProfileId])
 
   async function loadEntries() {
-    const data = await getEntriesByDate(currentDate)
+    const data = await getEntriesByDateAndProfile(currentDate, activeProfileId)
     setEntries(data)
   }
 
@@ -34,7 +58,7 @@ export function App() {
     if (entryData.id) {
       await updateEntry(entryData)
     } else {
-      await addEntry({ ...entryData, date: currentDate })
+      await addEntry({ ...entryData, date: currentDate, profileId: activeProfileId })
     }
     await loadEntries()
     setShowForm(false)
@@ -55,7 +79,7 @@ export function App() {
   }
 
   function handleSaveGoals(newGoals) {
-    saveGoals(newGoals)
+    saveGoals(newGoals, activeProfileId)
     setGoals(newGoals)
     setShowSettings(false)
   }
@@ -65,6 +89,19 @@ export function App() {
     setEditingEntry(null)
   }
 
+  function handleProfileChange(profileId) {
+    setActiveProfileId(profileId)
+    setActiveProfile(profileId)
+    setShowProfilePicker(false)
+    setShowSettings(false)
+  }
+
+  function handleProfileClick() {
+    setActiveProfileId(null)
+    setActiveProfile(null)
+    setShowProfilePicker(true)
+  }
+
   return (
     <div class="app">
       <Header
@@ -72,6 +109,8 @@ export function App() {
         onDateChange={setCurrentDate}
         onSettingsClick={() => setShowSettings(true)}
         onCalendarClick={() => setShowCalendar(true)}
+        profileName={currentProfile?.name}
+        onProfileClick={handleProfileClick}
       />
 
       <DailyProgress entries={entries} goals={goals} />
@@ -98,6 +137,8 @@ export function App() {
           onSave={handleSaveGoals}
           onClose={() => setShowSettings(false)}
           onDataChange={loadEntries}
+          onProfileChange={handleProfileChange}
+          activeProfileId={activeProfileId}
         />
       )}
 
@@ -117,6 +158,27 @@ export function App() {
           currentDate={currentDate}
           onSelect={setCurrentDate}
           onClose={() => setShowCalendar(false)}
+        />
+      )}
+
+      {showProfilePicker && hasProfiles && (
+        <ProfileSettings
+          onProfileSelect={handleProfileChange}
+          onClose={() => activeProfileId && setShowProfilePicker(false)}
+          isPickerMode={true}
+        />
+      )}
+
+      {showMigrationPrompt && (
+        <Modal
+          title="Add Profiles?"
+          message="Multiple people can track their calories separately on this device. Want to set up profiles?"
+          confirmText="Add Profiles"
+          onConfirm={() => {
+            setShowMigrationPrompt(false)
+            setShowProfilePicker(true)
+          }}
+          onCancel={() => setShowMigrationPrompt(false)}
         />
       )}
     </div>
