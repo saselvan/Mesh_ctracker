@@ -1,5 +1,5 @@
 const DB_NAME = 'calorie-tracker'
-const DB_VERSION = 1
+const DB_VERSION = 2
 const STORE_NAME = 'entries'
 
 let dbPromise = null
@@ -15,9 +15,19 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result
+      let store
+
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' })
+        store = db.createObjectStore(STORE_NAME, { keyPath: 'id' })
         store.createIndex('date', 'date', { unique: false })
+      } else {
+        store = event.target.transaction.objectStore(STORE_NAME)
+      }
+
+      if (event.oldVersion < 2) {
+        if (!store.indexNames.contains('profileDate')) {
+          store.createIndex('profileDate', ['profileId', 'date'], { unique: false })
+        }
       }
     }
   })
@@ -101,5 +111,75 @@ export async function importData(jsonString) {
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve(data.entries.length)
     tx.onerror = () => reject(tx.error)
+  })
+}
+
+export async function getEntriesByDateAndProfile(date, profileId = null) {
+  const db = await openDB()
+  const tx = db.transaction(STORE_NAME, 'readonly')
+  const store = tx.objectStore(STORE_NAME)
+
+  if (!profileId) {
+    const index = store.index('date')
+    const request = index.getAll(date)
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const entries = request.result.filter(e => !e.profileId)
+        resolve(entries)
+      }
+      request.onerror = () => reject(request.error)
+    })
+  }
+
+  const index = store.index('profileDate')
+  const request = index.getAll([profileId, date])
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error)
+  })
+}
+
+export async function addProfileIdToAllEntries(profileId) {
+  const db = await openDB()
+  const tx = db.transaction(STORE_NAME, 'readwrite')
+  const store = tx.objectStore(STORE_NAME)
+  const request = store.getAll()
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const entries = request.result
+      for (const entry of entries) {
+        if (!entry.profileId) {
+          entry.profileId = profileId
+          store.put(entry)
+        }
+      }
+      tx.oncomplete = () => resolve(entries.length)
+      tx.onerror = () => reject(tx.error)
+    }
+    request.onerror = () => reject(request.error)
+  })
+}
+
+export async function deleteEntriesByProfile(profileId) {
+  const db = await openDB()
+  const tx = db.transaction(STORE_NAME, 'readwrite')
+  const store = tx.objectStore(STORE_NAME)
+  const request = store.getAll()
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const entries = request.result
+      let deleted = 0
+      for (const entry of entries) {
+        if (entry.profileId === profileId) {
+          store.delete(entry.id)
+          deleted++
+        }
+      }
+      tx.oncomplete = () => resolve(deleted)
+      tx.onerror = () => reject(tx.error)
+    }
+    request.onerror = () => reject(request.error)
   })
 }
