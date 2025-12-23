@@ -1,13 +1,25 @@
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { exportAllData, importData } from '../utils/db'
+import { ProfileSettings } from './ProfileSettings'
+import { getProfiles } from '../utils/storage'
 
-export function Settings({ goals = {}, onSave = () => {}, onClose = () => {}, onDataChange = () => {} }) {
+export function Settings({
+  goals = {},
+  onSave = () => {},
+  onClose = () => {},
+  onDataChange = () => {},
+  onProfileChange = () => {},
+  activeProfileId = null
+}) {
   const [calories, setCalories] = useState(goals.calories?.toString() || '2000')
   const [protein, setProtein] = useState(goals.protein?.toString() || '150')
   const [carbs, setCarbs] = useState(goals.carbs?.toString() || '250')
   const [fat, setFat] = useState(goals.fat?.toString() || '65')
   const [status, setStatus] = useState('')
   const fileInputRef = useRef(null)
+
+  const profiles = getProfiles()
+  const hasProfiles = profiles.length > 0
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -60,10 +72,34 @@ export function Settings({ goals = {}, onSave = () => {}, onClose = () => {}, on
     e.target.value = ''
   }
 
+  const handleProfileSelect = (profileId) => {
+    onProfileChange(profileId)
+  }
+
   return (
     <div class="form-overlay" onClick={onClose}>
       <form class="entry-form" onClick={e => e.stopPropagation()} onSubmit={handleSubmit}>
         <h2 class="form-title">Settings</h2>
+
+        {hasProfiles && (
+          <ProfileSettings
+            onProfileSelect={handleProfileSelect}
+            onClose={() => {}}
+            isPickerMode={false}
+          />
+        )}
+
+        {!hasProfiles && (
+          <div class="profile-management">
+            <h3 class="form-section-title">Profiles</h3>
+            <p class="profile-hint">Add profiles for multiple users on this device.</p>
+            <ProfileSettings
+              onProfileSelect={handleProfileSelect}
+              onClose={() => {}}
+              isPickerMode={true}
+            />
+          </div>
+        )}
 
         <h3 class="form-section-title">Daily Goals</h3>
 
