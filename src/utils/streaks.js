@@ -1,4 +1,5 @@
 import { formatDate, getYesterday, getStartOfWeek, calculateTotals } from './date'
+import { SUCCESS_RATIO_MIN, SUCCESS_RATIO_MAX, HISTORY_LIMIT, MILESTONES } from './constants'
 
 export function getStreakData(profileId) {
   const key = profileId ? `streak-${profileId}` : 'streak'
@@ -21,7 +22,7 @@ export function saveStreakData(profileId, data) {
 export function isSuccessfulDay(calories, goal) {
   if (!goal || goal === 0) return false
   const ratio = calories / goal
-  return ratio >= 0.9 && ratio <= 1.1
+  return ratio >= SUCCESS_RATIO_MIN && ratio <= SUCCESS_RATIO_MAX
 }
 
 export function updateStreakForDay(profileId, date, calories, goal) {
@@ -49,7 +50,7 @@ export function updateStreakForDay(profileId, date, calories, goal) {
   // Keep only last 30 days
   data.history = data.history
     .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 30)
+    .slice(0, HISTORY_LIMIT)
 
   // Update streak
   if (date === today && success) {
@@ -78,8 +79,9 @@ export function updateStreakForDay(profileId, date, calories, goal) {
 
 function calculateWeeklyProgress(history) {
   const startOfWeek = getStartOfWeek(new Date())
+  const startOfWeekStr = formatDate(startOfWeek)
   return history.filter(h =>
-    h.success && new Date(h.date) >= startOfWeek
+    h.success && h.date >= startOfWeekStr
   ).length
 }
 
@@ -161,17 +163,16 @@ export function recalculateStreak(profileId, allEntries, goals) {
     current,
     longest,
     lastSuccessDate: lastSuccess,
-    history: dailyTotals.slice(-30),
+    history: dailyTotals.slice(-HISTORY_LIMIT),
     weeklyGoal: 5,
-    weeklyProgress: calculateWeeklyProgress(dailyTotals.slice(-30))
+    weeklyProgress: calculateWeeklyProgress(dailyTotals.slice(-HISTORY_LIMIT))
   }
 }
 
 export function checkMilestones(streakData) {
-  const milestones = [3, 7, 14, 30, 50, 100, 365]
   const achieved = streakData.milestones || []
 
-  return milestones.filter(days => {
+  return MILESTONES.filter(days => {
     return streakData.current >= days && !achieved.includes(days)
   }).map(days => ({
     days,

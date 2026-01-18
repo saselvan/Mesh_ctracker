@@ -1,8 +1,17 @@
+import {
+  PROTEIN_LOW_THRESHOLD,
+  STREAK_WEEK_THRESHOLD,
+  SUCCESS_RATE_HIGH,
+  SUCCESS_RATE_LOW,
+  MIN_DAYS_FOR_INSIGHTS,
+  UNDER_EATING_THRESHOLD
+} from './constants'
+
 export function generateInsights(trends, streakData, goals) {
   const insights = []
 
   // Low protein pattern
-  if (trends.avgProtein < goals.protein * 0.7) {
+  if (trends.avgProtein < goals.protein * PROTEIN_LOW_THRESHOLD) {
     insights.push({
       id: 'low-protein',
       type: 'warning',
@@ -13,7 +22,7 @@ export function generateInsights(trends, streakData, goals) {
   }
 
   // Streak celebration
-  if (streakData.current >= 7) {
+  if (streakData.current >= STREAK_WEEK_THRESHOLD) {
     insights.push({
       id: 'streak-week',
       type: 'success',
@@ -24,7 +33,7 @@ export function generateInsights(trends, streakData, goals) {
   }
 
   // High success rate
-  if (trends.successRate >= 80) {
+  if (trends.successRate >= SUCCESS_RATE_HIGH) {
     insights.push({
       id: 'high-success',
       type: 'success',
@@ -35,7 +44,7 @@ export function generateInsights(trends, streakData, goals) {
   }
 
   // Low success rate
-  if (trends.successRate < 50 && trends.daysLogged >= 3) {
+  if (trends.successRate < SUCCESS_RATE_LOW && trends.daysLogged >= MIN_DAYS_FOR_INSIGHTS) {
     insights.push({
       id: 'low-success',
       type: 'warning',
@@ -57,7 +66,7 @@ export function generateInsights(trends, streakData, goals) {
   }
 
   // Trending down (under-eating)
-  if (trends.trend === 'down' && trends.avgCalories < goals.calories * 0.8) {
+  if (trends.trend === 'down' && trends.avgCalories < goals.calories * UNDER_EATING_THRESHOLD) {
     insights.push({
       id: 'trending-down',
       type: 'warning',
@@ -68,7 +77,7 @@ export function generateInsights(trends, streakData, goals) {
   }
 
   // Not logging
-  if (trends.daysLogged < 3) {
+  if (trends.daysLogged < MIN_DAYS_FOR_INSIGHTS) {
     insights.push({
       id: 'log-more',
       type: 'info',

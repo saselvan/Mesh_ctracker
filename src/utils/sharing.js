@@ -1,3 +1,5 @@
+import { MILESTONES } from './constants'
+
 export async function generateShareImage(streakData, profile) {
   const canvas = document.createElement('canvas')
   canvas.width = 800
@@ -41,8 +43,7 @@ export async function generateShareImage(streakData, profile) {
   }
 
   // Milestone badge if applicable
-  const milestones = [3, 7, 14, 30, 50, 100, 365]
-  const currentMilestone = milestones.filter(m => streakData.current >= m).pop()
+  const currentMilestone = MILESTONES.filter(m => streakData.current >= m).pop()
   if (currentMilestone) {
     ctx.fillStyle = '#8B9D82'
     ctx.font = '20px system-ui'
