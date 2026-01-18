@@ -18,9 +18,9 @@ export function EntryList({ entries = [], onEdit = () => {}, onDelete = () => {}
             <span class="entry-calories">{entry.calories} cal</span>
           </div>
           <div class="entry-macros">
-            <span class="entry-macro">P: {entry.protein}g</span>
-            <span class="entry-macro">C: {entry.carbs}g</span>
-            <span class="entry-macro">F: {entry.fat}g</span>
+            <span class="entry-macro entry-macro--protein">{entry.protein}g</span>
+            <span class="entry-macro entry-macro--carbs">{entry.carbs}g</span>
+            <span class="entry-macro entry-macro--fat">{entry.fat}g</span>
           </div>
           <button
             class="entry-delete"

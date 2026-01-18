@@ -127,3 +127,43 @@ export function saveGoals(goals, profileId = null) {
     console.error('Failed to save goals:', e)
   }
 }
+
+export function getFavorites(profileId) {
+  try {
+    const key = profileId ? `favorites-${profileId}` : 'favorites'
+    const stored = localStorage.getItem(key)
+    return stored ? JSON.parse(stored) : []
+  } catch (e) {
+    console.error('Failed to load favorites:', e)
+    return []
+  }
+}
+
+export function saveFavorites(favorites, profileId) {
+  try {
+    const key = profileId ? `favorites-${profileId}` : 'favorites'
+    localStorage.setItem(key, JSON.stringify(favorites.slice(0, 20)))
+  } catch (e) {
+    console.error('Failed to save favorites:', e)
+  }
+}
+
+export function getTemplates(profileId) {
+  try {
+    const key = profileId ? `templates-${profileId}` : 'templates'
+    const stored = localStorage.getItem(key)
+    return stored ? JSON.parse(stored) : []
+  } catch (e) {
+    console.error('Failed to load templates:', e)
+    return []
+  }
+}
+
+export function saveTemplates(templates, profileId) {
+  try {
+    const key = profileId ? `templates-${profileId}` : 'templates'
+    localStorage.setItem(key, JSON.stringify(templates))
+  } catch (e) {
+    console.error('Failed to save templates:', e)
+  }
+}

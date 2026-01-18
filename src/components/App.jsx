@@ -11,6 +11,8 @@ import { ProfileSettings } from './ProfileSettings'
 import { getEntriesByDateAndProfile, addEntry, updateEntry, deleteEntry } from '../utils/db'
 import { getGoals, saveGoals, getProfiles, getActiveProfileId, setActiveProfileId, needsMigration } from '../utils/storage'
 import { getToday } from '../utils/date'
+import { checkAndUpdateStreak } from '../utils/streaks'
+import { applyTheme } from '../utils/theme'
 
 export function App() {
   const [currentDate, setCurrentDate] = useState(getToday())
@@ -42,8 +44,20 @@ export function App() {
   }, [])
 
   useEffect(() => {
+    applyTheme()
+    const interval = setInterval(applyTheme, 15 * 60 * 1000) // Check every 15min
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
     loadEntries()
   }, [currentDate, activeProfileId])
+
+  useEffect(() => {
+    if (entries.length > 0 && goals.calories > 0) {
+      checkAndUpdateStreak(activeProfileId, entries, goals)
+    }
+  }, [entries, goals, activeProfileId])
 
   useEffect(() => {
     setGoals(getGoals(activeProfileId))

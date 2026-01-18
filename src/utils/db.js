@@ -183,3 +183,50 @@ export async function deleteEntriesByProfile(profileId) {
     request.onerror = () => reject(request.error)
   })
 }
+
+export async function getRecentFoods(profileId, limit = 10) {
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  const db = await openDB()
+  const tx = db.transaction(STORE_NAME, 'readonly')
+  const store = tx.objectStore(STORE_NAME)
+  const request = store.getAll()
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const entries = request.result
+        .filter(e => {
+          if (profileId && e.profileId !== profileId) return false
+          if (!profileId && e.profileId) return false
+          const entryDate = new Date(e.date + 'T00:00:00')
+          return entryDate >= sevenDaysAgo
+        })
+
+      // Count frequency
+      const foodMap = new Map()
+      for (const entry of entries) {
+        const count = foodMap.get(entry.name) || 0
+        foodMap.set(entry.name, count + 1)
+      }
+
+      // Sort by frequency
+      const sorted = Array.from(foodMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .map(([name]) => {
+          const example = entries.find(e => e.name === name)
+          return {
+            name,
+            calories: example.calories,
+            protein: example.protein,
+            carbs: example.carbs,
+            fat: example.fat
+          }
+        })
+
+      resolve(sorted)
+    }
+    request.onerror = () => reject(request.error)
+  })
+}

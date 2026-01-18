@@ -34,3 +34,43 @@ export function addDays(dateStr, days) {
 export function getToday() {
   return formatDate(new Date())
 }
+
+/**
+ * Get yesterday's date as YYYY-MM-DD string
+ */
+export function getYesterday(date = new Date()) {
+  const d = new Date(date)
+  d.setDate(d.getDate() - 1)
+  return formatDate(d)
+}
+
+/**
+ * Get start of week (Monday) as Date object
+ */
+export function getStartOfWeek(date = new Date()) {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+
+/**
+ * Calculate totals from an array of entries
+ */
+export function calculateTotals(entries) {
+  return entries.reduce((acc, entry) => ({
+    calories: acc.calories + (entry.calories || 0),
+    protein: acc.protein + (entry.protein || 0),
+    carbs: acc.carbs + (entry.carbs || 0),
+    fat: acc.fat + (entry.fat || 0)
+  }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
+}
+
+/**
+ * Pick a random element from an array
+ */
+export function pickRandom(array) {
+  return array[Math.floor(Math.random() * array.length)]
+}
