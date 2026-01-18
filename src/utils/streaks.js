@@ -10,7 +10,8 @@ export function getStreakData(profileId) {
     lastSuccessDate: null,
     history: [],
     weeklyGoal: 5,
-    weeklyProgress: 0
+    weeklyProgress: 0,
+    milestones: []
   }
 }
 
@@ -72,6 +73,18 @@ export function updateStreakForDay(profileId, date, calories, goal) {
 
   // Update weekly progress
   data.weeklyProgress = calculateWeeklyProgress(data.history)
+
+  // Check for new milestones
+  const newMilestones = checkMilestones(data)
+  if (newMilestones.length > 0) {
+    data.milestones = data.milestones || []
+    for (const milestone of newMilestones) {
+      if (!data.milestones.includes(milestone.days)) {
+        data.milestones.push(milestone.days)
+      }
+    }
+    data.milestones.sort((a, b) => a - b)
+  }
 
   saveStreakData(profileId, data)
   return data
@@ -177,19 +190,19 @@ export function checkMilestones(streakData) {
   }).map(days => ({
     days,
     message: getMilestoneMessage(days),
-    achieved: false
+    achieved: true
   }))
 }
 
 function getMilestoneMessage(days) {
   const messages = {
-    3: '3-day streak! Building momentum!',
-    7: 'One week strong!',
-    14: 'Two weeks! You\'re on fire!',
-    30: 'One month streak! Incredible!',
-    50: '50 days! Unstoppable!',
-    100: '100-day streak! Legendary!',
-    365: 'One full year! Champion!'
+    3: 'Three days strong!',
+    7: 'One week warrior!',
+    14: 'Two week champion!',
+    30: 'Monthly master!',
+    50: 'Fifty day legend!',
+    100: 'Century club!',
+    365: 'Full year hero!'
   }
-  return messages[days] || `${days}-day streak!`
+  return messages[days] || `${days} days!`
 }

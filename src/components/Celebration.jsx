@@ -11,69 +11,77 @@ export function Celebration({ onComplete }) {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const dots = Array.from({ length: 50 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      radius: 0,
-      maxRadius: Math.random() * 30 + 10,
-      delay: Math.random() * 500,
-      color: ['#5C6B54', '#C17B5F', '#FAF7F2'][Math.floor(Math.random() * 3)],
-      startTime: Date.now()
-    }))
+    const colors = ['#8B9D82', '#C87864', '#E8DFD8', '#FDF6F0']
+    const dots = []
 
-    let animationId
+    // Create 50 random dots
+    for (let i = 0; i < 50; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: 0,
+        maxRadius: Math.random() * 40 + 20,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        delay: Math.random() * 500,
+        opacity: 1
+      })
+    }
 
-    function animate() {
+    let startTime = null
+    const duration = 2000
+
+    function animate(timestamp) {
+      if (!startTime) startTime = timestamp
+      const elapsed = timestamp - startTime
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const now = Date.now()
+
       let allComplete = true
 
-      for (const dot of dots) {
-        const elapsed = now - dot.startTime - dot.delay
-        if (elapsed < 0) {
+      dots.forEach(dot => {
+        const dotElapsed = elapsed - dot.delay
+        if (dotElapsed < 0) {
           allComplete = false
-          continue
+          return
         }
 
-        const progress = Math.min(elapsed / 2000, 1)
+        const progress = Math.min(dotElapsed / duration, 1)
+        dot.radius = dot.maxRadius * Math.sin(progress * Math.PI)
+        dot.opacity = 1 - progress
+
         if (progress < 1) allComplete = false
 
-        dot.radius = dot.maxRadius * progress
-        const opacity = 1 - progress
-
-        ctx.fillStyle = dot.color
-        ctx.globalAlpha = opacity
         ctx.beginPath()
+        ctx.fillStyle = dot.color
+        ctx.globalAlpha = dot.opacity * 0.7
         ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2)
         ctx.fill()
-      }
+      })
 
       ctx.globalAlpha = 1
 
       if (!allComplete) {
-        animationId = requestAnimationFrame(animate)
-      } else if (onComplete) {
-        onComplete()
+        requestAnimationFrame(animate)
+      } else {
+        onComplete?.()
       }
     }
 
-    animationId = requestAnimationFrame(animate)
-
-    return () => {
-      if (animationId) cancelAnimationFrame(animationId)
-    }
+    requestAnimationFrame(animate)
   }, [onComplete])
 
   return (
-    <div
+    <canvas
+      ref={canvasRef}
       style={{
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
         pointerEvents: 'none',
         zIndex: 1000
       }}
-    >
-      <canvas ref={canvasRef} />
-    </div>
+    />
   )
 }

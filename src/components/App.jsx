@@ -8,6 +8,9 @@ import { Modal } from './Modal'
 import { FAB } from './FAB'
 import { DatePicker } from './DatePicker'
 import { ProfileSettings } from './ProfileSettings'
+import { Celebration } from './Celebration'
+import { StreakDisplay } from './StreakDisplay'
+import { CoachingMessage } from './CoachingMessage'
 import { getEntriesByDateAndProfile, addEntry, updateEntry, deleteEntry } from '../utils/db'
 import { getGoals, saveGoals, getProfiles, getActiveProfileId, setActiveProfileId, needsMigration } from '../utils/storage'
 import { getToday } from '../utils/date'
@@ -26,6 +29,7 @@ export function App() {
   const [showMigrationPrompt, setShowMigrationPrompt] = useState(false)
   const [editingEntry, setEditingEntry] = useState(null)
   const [deletingEntry, setDeletingEntry] = useState(null)
+  const [showCelebration, setShowCelebration] = useState(false)
 
   const profiles = getProfiles()
   const hasProfiles = profiles.length > 0
@@ -116,6 +120,19 @@ export function App() {
     setShowProfilePicker(true)
   }
 
+  function handleCelebrationTrigger() {
+    setShowCelebration(true)
+  }
+
+  // Calculate progress for coaching message
+  const totals = entries.reduce(
+    (acc, entry) => ({
+      calories: acc.calories + (entry.calories || 0)
+    }),
+    { calories: 0 }
+  )
+  const progress = goals.calories > 0 ? totals.calories / goals.calories : 0
+
   return (
     <div class="app">
       <Header
@@ -127,7 +144,24 @@ export function App() {
         onProfileClick={handleProfileClick}
       />
 
-      <DailyProgress entries={entries} goals={goals} />
+      <CoachingMessage
+        progress={progress}
+        profileName={currentProfile?.name}
+      />
+
+      <DailyProgress
+        entries={entries}
+        goals={goals}
+        profileId={activeProfileId}
+        date={currentDate}
+        onCelebrationTrigger={handleCelebrationTrigger}
+      />
+
+      <StreakDisplay
+        profileId={activeProfileId}
+        profile={currentProfile}
+        onDateClick={setCurrentDate}
+      />
 
       <EntryList
         entries={entries}
@@ -194,6 +228,10 @@ export function App() {
           }}
           onCancel={() => setShowMigrationPrompt(false)}
         />
+      )}
+
+      {showCelebration && (
+        <Celebration onComplete={() => setShowCelebration(false)} />
       )}
     </div>
   )

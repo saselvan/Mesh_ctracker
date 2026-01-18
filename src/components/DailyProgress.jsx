@@ -1,3 +1,5 @@
+import { useEffect } from 'preact/hooks'
+
 const DEFAULT_GOALS = { calories: 2000, protein: 150, carbs: 250, fat: 65 }
 const CLOSE_THRESHOLD = 0.9  // 90% of goal
 const OVER_THRESHOLD = 1.0   // 100% of goal
@@ -8,7 +10,7 @@ const MAIN_CIRCUMFERENCE = 2 * Math.PI * MAIN_RADIUS
 const MACRO_RADIUS = 22
 const MACRO_CIRCUMFERENCE = 2 * Math.PI * MACRO_RADIUS
 
-export function DailyProgress({ entries = [], goals = DEFAULT_GOALS }) {
+export function DailyProgress({ entries = [], goals = DEFAULT_GOALS, profileId, date, onCelebrationTrigger }) {
   const totals = entries.reduce(
     (acc, entry) => ({
       calories: acc.calories + (entry.calories || 0),
@@ -36,6 +38,20 @@ export function DailyProgress({ entries = [], goals = DEFAULT_GOALS }) {
     { key: 'carbs', label: 'Carbs', value: totals.carbs, goal: goals.carbs },
     { key: 'fat', label: 'Fat', value: totals.fat, goal: goals.fat }
   ]
+
+  // Check celebration trigger
+  useEffect(() => {
+    if (!profileId || !date || !onCelebrationTrigger) return
+
+    const ratio = totals.calories / goals.calories
+    const celebrationKey = `celebrated-${profileId}-${date}`
+    const alreadyCelebrated = localStorage.getItem(celebrationKey)
+
+    if (ratio >= 0.9 && ratio <= 1.1 && !alreadyCelebrated) {
+      localStorage.setItem(celebrationKey, 'true')
+      onCelebrationTrigger()
+    }
+  }, [totals.calories, goals.calories, profileId, date, onCelebrationTrigger])
 
   return (
     <div class="progress-card">

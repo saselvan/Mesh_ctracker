@@ -1,35 +1,71 @@
 import { getStreakData } from '../utils/streaks'
-import { shareAchievement } from '../utils/sharing'
+import { formatDate } from '../utils/date'
 
-export function StreakDisplay({ profileId, profile }) {
+export function StreakDisplay({ profileId, profile, onDateClick }) {
   const streakData = getStreakData(profileId)
 
-  async function handleShare() {
-    await shareAchievement(streakData, profile)
+  // Generate last 30 days
+  const days = []
+  const today = new Date()
+  const todayStr = formatDate(today)
+
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const dateStr = formatDate(date)
+    const historyEntry = streakData.history?.find(h => h.date === dateStr)
+
+    let status = 'missed'
+    if (historyEntry?.success) {
+      status = 'success'
+    } else if (dateStr === todayStr) {
+      status = 'pending'
+    }
+
+    days.push({
+      date: dateStr,
+      status,
+      isToday: dateStr === todayStr
+    })
   }
 
   return (
-    <div class="progress-card" style="margin-bottom: var(--space-6)">
-      <div style="text-align: center">
-        <div style="font-family: var(--font-display); font-size: 3rem; font-weight: 700; color: var(--color-sage)">
-          {streakData.current}
+    <div class="streak-display">
+      <div class="streak-stats">
+        <div class="streak-current">
+          <span class="streak-number">{streakData.current || 0}</span>
+          <span class="streak-label">day streak</span>
         </div>
-        <div style="font-size: 0.875rem; color: var(--color-muted); margin-bottom: var(--space-3)">
-          Day Streak
+        <div class="streak-longest">
+          <span class="streak-number">{streakData.longest || 0}</span>
+          <span class="streak-label">longest</span>
         </div>
-        <div style="font-size: 0.75rem; color: var(--color-warm-gray)">
-          Best: {streakData.longest} days
-        </div>
-        {streakData.current > 0 && (
-          <button
-            class="btn btn--secondary"
-            style="margin-top: var(--space-4); font-size: 0.875rem"
-            onClick={handleShare}
-          >
-            Share Achievement
-          </button>
-        )}
       </div>
+
+      <div class="streak-calendar">
+        {days.map(day => (
+          <button
+            key={day.date}
+            class={`streak-dot streak-${day.status} ${day.isToday ? 'streak-today' : ''}`}
+            onClick={() => onDateClick?.(day.date)}
+            aria-label={`${day.date}: ${day.status}`}
+          />
+        ))}
+      </div>
+
+      {(streakData.milestones || []).length > 0 && (
+        <div class="milestone-badges">
+          {(streakData.milestones || []).map(m => (
+            <span key={m} class="milestone-badge">🏆 {m}</span>
+          ))}
+        </div>
+      )}
+
+      {streakData.weeklyGoal && (
+        <div class="weekly-progress">
+          <span>{streakData.weeklyProgress || 0}/{streakData.weeklyGoal} this week</span>
+        </div>
+      )}
     </div>
   )
 }
