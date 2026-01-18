@@ -11,6 +11,7 @@ import { ProfileSettings } from './ProfileSettings'
 import { Celebration } from './Celebration'
 import { StreakDisplay } from './StreakDisplay'
 import { CoachingMessage } from './CoachingMessage'
+import { TemplateManager } from './TemplateManager'
 import { getEntriesByDateAndProfile, addEntry, updateEntry, deleteEntry } from '../utils/db'
 import { getGoals, saveGoals, getProfiles, getActiveProfileId, setActiveProfileId, needsMigration } from '../utils/storage'
 import { getToday } from '../utils/date'
@@ -30,6 +31,7 @@ export function App() {
   const [editingEntry, setEditingEntry] = useState(null)
   const [deletingEntry, setDeletingEntry] = useState(null)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
 
   const profiles = getProfiles()
   const hasProfiles = profiles.length > 0
@@ -124,6 +126,18 @@ export function App() {
     setShowCelebration(true)
   }
 
+  async function handleApplyTemplate(template) {
+    for (const entry of template.entries) {
+      await addEntry({
+        ...entry,
+        date: currentDate,
+        profileId: activeProfileId
+      })
+    }
+    await loadEntries()
+    setShowTemplates(false)
+  }
+
   // Calculate progress for coaching message
   const totals = entries.reduce(
     (acc, entry) => ({
@@ -167,6 +181,8 @@ export function App() {
         entries={entries}
         onEdit={handleEditEntry}
         onDelete={setDeletingEntry}
+        profileId={activeProfileId}
+        onShowTemplates={() => setShowTemplates(true)}
       />
 
       <FAB onClick={() => setShowForm(true)} />
@@ -176,6 +192,7 @@ export function App() {
           entry={editingEntry}
           onSave={handleSaveEntry}
           onCancel={handleCloseForm}
+          profileId={activeProfileId}
         />
       )}
 
@@ -232,6 +249,14 @@ export function App() {
 
       {showCelebration && (
         <Celebration onComplete={() => setShowCelebration(false)} />
+      )}
+
+      {showTemplates && (
+        <TemplateManager
+          profileId={activeProfileId}
+          onSelect={handleApplyTemplate}
+          onClose={() => setShowTemplates(false)}
+        />
       )}
     </div>
   )

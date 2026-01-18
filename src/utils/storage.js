@@ -167,3 +167,22 @@ export function saveTemplates(templates, profileId) {
     console.error('Failed to save templates:', e)
   }
 }
+
+export function createTemplate(name, entries, profileId) {
+  const templates = getTemplates(profileId)
+  const newTemplate = {
+    id: Date.now(),
+    name,
+    entries: entries.map(e => ({
+      name: e.name,
+      calories: e.calories,
+      protein: e.protein,
+      carbs: e.carbs,
+      fat: e.fat,
+      mealType: e.mealType
+    })),
+    createdAt: new Date().toISOString()
+  }
+  saveTemplates([newTemplate, ...templates], profileId)
+  return newTemplate
+}

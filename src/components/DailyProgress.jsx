@@ -1,4 +1,5 @@
 import { useEffect } from 'preact/hooks'
+import { SUCCESS_RATIO_MIN, SUCCESS_RATIO_MAX } from '../utils/constants'
 
 const DEFAULT_GOALS = { calories: 2000, protein: 150, carbs: 250, fat: 65 }
 const CLOSE_THRESHOLD = 0.9  // 90% of goal
@@ -47,7 +48,7 @@ export function DailyProgress({ entries = [], goals = DEFAULT_GOALS, profileId, 
     const celebrationKey = `celebrated-${profileId}-${date}`
     const alreadyCelebrated = localStorage.getItem(celebrationKey)
 
-    if (ratio >= 0.9 && ratio <= 1.1 && !alreadyCelebrated) {
+    if (ratio >= SUCCESS_RATIO_MIN && ratio <= SUCCESS_RATIO_MAX && !alreadyCelebrated) {
       localStorage.setItem(celebrationKey, 'true')
       onCelebrationTrigger()
     }

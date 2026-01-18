@@ -1,5 +1,5 @@
 const DB_NAME = 'calorie-tracker'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const STORE_NAME = 'entries'
 
 let dbPromise = null
@@ -27,6 +27,19 @@ function openDB() {
       if (event.oldVersion < 2) {
         if (!store.indexNames.contains('profileDate')) {
           store.createIndex('profileDate', ['profileId', 'date'], { unique: false })
+        }
+      }
+
+      if (event.oldVersion < 3) {
+        store.openCursor().onsuccess = (e) => {
+          const cursor = e.target.result
+          if (cursor) {
+            if (!cursor.value.mealType) {
+              cursor.value.mealType = 'snack'
+              cursor.update(cursor.value)
+            }
+            cursor.continue()
+          }
         }
       }
     }
@@ -221,7 +234,8 @@ export async function getRecentFoods(profileId, limit = 10) {
             calories: example.calories,
             protein: example.protein,
             carbs: example.carbs,
-            fat: example.fat
+            fat: example.fat,
+            mealType: example.mealType
           }
         })
 

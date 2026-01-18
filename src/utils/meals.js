@@ -1,16 +1,19 @@
 export const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Breakfast', icon: '🌅' },
-  { id: 'lunch', label: 'Lunch', icon: '☀️' },
-  { id: 'dinner', label: 'Dinner', icon: '🌙' },
-  { id: 'snack', label: 'Snack', icon: '🍎' }
+  { id: 'breakfast', label: 'Breakfast', icon: '🌅', hours: [5, 10] },
+  { id: 'lunch', label: 'Lunch', icon: '☀️', hours: [11, 14] },
+  { id: 'dinner', label: 'Dinner', icon: '🌙', hours: [17, 21] },
+  { id: 'snack', label: 'Snack', icon: '🍎', hours: null }
 ]
 
 export function getSuggestedMealType() {
   const hour = new Date().getHours()
 
-  if (hour >= 5 && hour < 10) return 'breakfast'
-  if (hour >= 11 && hour < 14) return 'lunch'
-  if (hour >= 17 && hour < 21) return 'dinner'
+  for (const meal of MEAL_TYPES) {
+    if (meal.hours && hour >= meal.hours[0] && hour <= meal.hours[1]) {
+      return meal.id
+    }
+  }
+
   return 'snack'
 }
 
