@@ -1,58 +1,68 @@
-import { getStartOfWeek, calculateTotals, formatDate } from './date'
+import { getStartOfWeek, formatDate, calculateTotals } from './date'
 
 export function getWeeklyTrends(entries, goals) {
-  const startOfWeek = getStartOfWeek(new Date())
-  const weekEntries = entries.filter(e => new Date(e.date + 'T00:00:00') >= startOfWeek)
+  const weekStart = getStartOfWeek(new Date())
+  const weekEntries = entries.filter(e => e.date >= weekStart)
 
-  if (weekEntries.length === 0) {
+  // Group by date
+  const byDate = {}
+  weekEntries.forEach(entry => {
+    if (!byDate[entry.date]) byDate[entry.date] = []
+    byDate[entry.date].push(entry)
+  })
+
+  const dailyTotals = Object.entries(byDate).map(([date, dayEntries]) => ({
+    date,
+    ...calculateTotals(dayEntries)
+  }))
+
+  const daysLogged = dailyTotals.length
+  if (daysLogged === 0) {
     return {
       avgCalories: 0,
       avgProtein: 0,
       avgCarbs: 0,
       avgFat: 0,
       successRate: 0,
-      trend: 'stable',
-      daysLogged: 0
+      successCount: 0,
+      daysLogged: 0,
+      trend: 'stable'
     }
   }
 
-  // Group by date
-  const byDate = new Map()
-  for (const entry of weekEntries) {
-    if (!byDate.has(entry.date)) {
-      byDate.set(entry.date, [])
-    }
-    byDate.get(entry.date).push(entry)
-  }
+  const avgCalories = dailyTotals.reduce((sum, d) => sum + d.calories, 0) / daysLogged
+  const avgProtein = dailyTotals.reduce((sum, d) => sum + d.protein, 0) / daysLogged
+  const avgCarbs = dailyTotals.reduce((sum, d) => sum + d.carbs, 0) / daysLogged
+  const avgFat = dailyTotals.reduce((sum, d) => sum + d.fat, 0) / daysLogged
 
-  const dailyTotals = []
+  // Success rate (within 90-110% of goal)
   let successCount = 0
-
-  for (const [date, dateEntries] of byDate) {
-    const totals = calculateTotals(dateEntries)
-    dailyTotals.push(totals)
-
-    const ratio = goals.calories > 0 ? totals.calories / goals.calories : 0
-    if (ratio >= 0.9 && ratio <= 1.1) {
-      successCount++
+  dailyTotals.forEach(d => {
+    if (goals.calories > 0) {
+      const ratio = d.calories / goals.calories
+      if (ratio >= 0.9 && ratio <= 1.1) {
+        successCount++
+      }
     }
-  }
-
-  const daysLogged = dailyTotals.length
-  const avgCalories = dailyTotals.reduce((sum, t) => sum + t.calories, 0) / daysLogged
-  const avgProtein = dailyTotals.reduce((sum, t) => sum + t.protein, 0) / daysLogged
-  const avgCarbs = dailyTotals.reduce((sum, t) => sum + t.carbs, 0) / daysLogged
-  const avgFat = dailyTotals.reduce((sum, t) => sum + t.fat, 0) / daysLogged
+  })
 
   const successRate = (successCount / daysLogged) * 100
 
-  // Determine trend
+  // Trend calculation (compare first half to second half of week)
+  const midpoint = Math.floor(daysLogged / 2)
+  const firstHalf = dailyTotals.slice(0, midpoint)
+  const secondHalf = dailyTotals.slice(midpoint)
+
+  const firstAvg = firstHalf.length > 0
+    ? firstHalf.reduce((sum, d) => sum + d.calories, 0) / firstHalf.length
+    : 0
+  const secondAvg = secondHalf.length > 0
+    ? secondHalf.reduce((sum, d) => sum + d.calories, 0) / secondHalf.length
+    : 0
+
   let trend = 'stable'
-  if (avgCalories > goals.calories * 1.05) {
-    trend = 'up'
-  } else if (avgCalories < goals.calories * 0.95) {
-    trend = 'down'
-  }
+  if (secondAvg > firstAvg * 1.1) trend = 'up'
+  if (secondAvg < firstAvg * 0.9) trend = 'down'
 
   return {
     avgCalories: Math.round(avgCalories),
@@ -60,7 +70,8 @@ export function getWeeklyTrends(entries, goals) {
     avgCarbs: Math.round(avgCarbs),
     avgFat: Math.round(avgFat),
     successRate: Math.round(successRate),
-    trend,
-    daysLogged
+    successCount,
+    daysLogged,
+    trend
   }
 }

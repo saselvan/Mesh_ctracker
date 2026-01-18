@@ -4,79 +4,84 @@ export async function generateShareImage(streakData, profile) {
   canvas.height = 600
   const ctx = canvas.getContext('2d')
 
-  // Background gradient
-  const gradient = ctx.createLinearGradient(0, 0, 0, 600)
-  gradient.addColorStop(0, '#FAF7F2')
-  gradient.addColorStop(1, '#E8EDE6')
-  ctx.fillStyle = gradient
+  // Background
+  ctx.fillStyle = '#FDF6F0'
   ctx.fillRect(0, 0, 800, 600)
 
   // Decorative dots (Kusama-inspired)
-  ctx.fillStyle = 'rgba(92, 107, 84, 0.1)'
+  const dotColors = ['#8B9D82', '#C87864', '#E8DFD8']
   for (let i = 0; i < 30; i++) {
-    const x = Math.random() * 800
-    const y = Math.random() * 600
-    const r = Math.random() * 20 + 10
     ctx.beginPath()
-    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fillStyle = dotColors[i % 3]
+    ctx.arc(
+      Math.random() * 800,
+      Math.random() * 600,
+      Math.random() * 20 + 5,
+      0,
+      Math.PI * 2
+    )
+    ctx.globalAlpha = 0.3
     ctx.fill()
   }
+  ctx.globalAlpha = 1
 
-  // Streak number
-  ctx.fillStyle = '#5C6B54'
-  ctx.font = 'bold 120px Georgia'
-  ctx.textAlign = 'center'
-  ctx.fillText(streakData.current, 400, 280)
-
-  // Text
+  // Main content
   ctx.fillStyle = '#3D3D3D'
-  ctx.font = '40px Georgia'
-  ctx.fillText('DAY STREAK', 400, 340)
+  ctx.font = 'bold 120px system-ui'
+  ctx.textAlign = 'center'
+  ctx.fillText(`${streakData.current}`, 400, 280)
 
-  if (profile) {
-    ctx.font = '24px sans-serif'
-    ctx.fillStyle = '#6B6B6B'
-    ctx.fillText(profile.name, 400, 450)
+  ctx.font = '32px system-ui'
+  ctx.fillText('day streak!', 400, 340)
+
+  if (profile?.name) {
+    ctx.font = '24px system-ui'
+    ctx.fillStyle = '#666'
+    ctx.fillText(`${profile.name}'s progress`, 400, 400)
   }
 
-  // Convert to blob
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), 'image/png')
+  // Milestone badge if applicable
+  const milestones = [3, 7, 14, 30, 50, 100, 365]
+  const currentMilestone = milestones.filter(m => streakData.current >= m).pop()
+  if (currentMilestone) {
+    ctx.fillStyle = '#8B9D82'
+    ctx.font = '20px system-ui'
+    ctx.fillText(`🏆 ${currentMilestone}-day milestone`, 400, 450)
+  }
+
+  // Footer
+  ctx.fillStyle = '#999'
+  ctx.font = '16px system-ui'
+  ctx.fillText('Calorie Tracker', 400, 550)
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => resolve(blob), 'image/png')
   })
 }
 
-export async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch (err) {
-    console.error('Failed to copy:', err)
-    return false
-  }
-}
-
 export async function shareAchievement(streakData, profile) {
-  const text = `${streakData.current} day streak! 🔥`
+  const text = `I'm on a ${streakData.current}-day streak with Calorie Tracker! 🎯`
 
   if (navigator.share) {
     try {
       const blob = await generateShareImage(streakData, profile)
       const file = new File([blob], 'streak.png', { type: 'image/png' })
+
       await navigator.share({
         text,
         files: [file]
       })
       return true
-    } catch (err) {
-      // Fallback to text only
-      try {
-        await navigator.share({ text })
-        return true
-      } catch {
-        return await copyToClipboard(text)
-      }
+    } catch (e) {
+      // Fall back to clipboard
     }
-  } else {
-    return await copyToClipboard(text)
   }
+
+  // Clipboard fallback
+  await navigator.clipboard.writeText(text)
+  return 'clipboard'
+}
+
+export async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text)
 }

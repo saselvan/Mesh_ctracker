@@ -1,77 +1,85 @@
 export function generateInsights(trends, streakData, goals) {
   const insights = []
 
-  // Streak insights
-  if (streakData.current >= 7) {
+  // Low protein pattern
+  if (trends.avgProtein < goals.protein * 0.7) {
     insights.push({
-      id: 'long-streak',
-      type: 'motivational',
-      priority: 'high',
-      message: `${streakData.current}-day streak! You're building incredible consistency.`,
-      actionable: false
-    })
-  } else if (streakData.current === 0 && streakData.longest > 0) {
-    insights.push({
-      id: 'broken-streak',
-      type: 'helpful',
-      priority: 'high',
-      message: `Your ${streakData.longest}-day streak can be rebuilt. Start fresh today!`,
+      id: 'low-protein',
+      type: 'warning',
+      priority: 2,
+      message: `Your protein is averaging ${trends.avgProtein}g, below your ${goals.protein}g goal. Try adding eggs or Greek yogurt.`,
       actionable: true
     })
   }
 
-  // Success rate insights
+  // Streak celebration
+  if (streakData.current >= 7) {
+    insights.push({
+      id: 'streak-week',
+      type: 'success',
+      priority: 1,
+      message: `Amazing! You're on a ${streakData.current}-day streak!`,
+      actionable: false
+    })
+  }
+
+  // High success rate
+  if (trends.successRate >= 80) {
+    insights.push({
+      id: 'high-success',
+      type: 'success',
+      priority: 2,
+      message: `${trends.successRate}% success rate this week - you're crushing it!`,
+      actionable: false
+    })
+  }
+
+  // Low success rate
   if (trends.successRate < 50 && trends.daysLogged >= 3) {
     insights.push({
       id: 'low-success',
-      type: 'critical',
-      priority: 'critical',
-      message: 'You\'re hitting your goal less than half the time. Consider adjusting your targets.',
-      actionable: true
-    })
-  } else if (trends.successRate >= 80 && trends.daysLogged >= 5) {
-    insights.push({
-      id: 'high-success',
-      type: 'motivational',
-      priority: 'medium',
-      message: `${trends.successRate}% success rate this week! Outstanding consistency.`,
-      actionable: false
-    })
-  }
-
-  // Protein insights
-  if (goals.protein > 0 && trends.avgProtein < goals.protein * 0.7) {
-    insights.push({
-      id: 'low-protein',
-      type: 'helpful',
-      priority: 'high',
-      message: `You're averaging ${trends.avgProtein}g protein vs ${goals.protein}g goal. Consider adding protein-rich foods.`,
+      type: 'warning',
+      priority: 1,
+      message: `Only ${trends.successRate}% on target this week. Consider adjusting your calorie goal.`,
       actionable: true
     })
   }
 
-  // Calorie trend insights
-  if (trends.trend === 'up') {
+  // Trending up (overeating)
+  if (trends.trend === 'up' && trends.avgCalories > goals.calories) {
     insights.push({
-      id: 'calorie-up',
-      type: 'helpful',
-      priority: 'medium',
-      message: `Your weekly average (${trends.avgCalories} cal) is above your goal. Track weekend eating patterns.`,
-      actionable: true
-    })
-  } else if (trends.trend === 'down') {
-    insights.push({
-      id: 'calorie-down',
-      type: 'helpful',
-      priority: 'medium',
-      message: `You're averaging ${trends.avgCalories} cal, below your ${goals.calories} goal. Make sure you're eating enough.`,
+      id: 'trending-up',
+      type: 'warning',
+      priority: 2,
+      message: `Calorie intake trending upward. Watch portion sizes.`,
       actionable: true
     })
   }
 
-  // Sort by priority
-  const priorityOrder = { critical: 3, high: 2, medium: 1, low: 0 }
-  insights.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
+  // Trending down (under-eating)
+  if (trends.trend === 'down' && trends.avgCalories < goals.calories * 0.8) {
+    insights.push({
+      id: 'trending-down',
+      type: 'warning',
+      priority: 2,
+      message: `You're eating less each day. Make sure you're fueling properly.`,
+      actionable: true
+    })
+  }
 
-  return insights.slice(0, 3)
+  // Not logging
+  if (trends.daysLogged < 3) {
+    insights.push({
+      id: 'log-more',
+      type: 'info',
+      priority: 3,
+      message: `Log more days this week for better insights.`,
+      actionable: true
+    })
+  }
+
+  // Sort by priority and return top 3
+  return insights
+    .sort((a, b) => a.priority - b.priority)
+    .slice(0, 3)
 }
