@@ -12,6 +12,8 @@ import { Celebration } from './Celebration'
 import { StreakDisplay } from './StreakDisplay'
 import { CoachingMessage } from './CoachingMessage'
 import { TemplateManager } from './TemplateManager'
+import { InstallPrompt } from './InstallPrompt'
+import { OfflineIndicator } from './OfflineIndicator'
 import { getEntriesByDateAndProfile, addEntry, updateEntry, deleteEntry } from '../utils/db'
 import { getGoals, saveGoals, getProfiles, getActiveProfileId, setActiveProfileId, needsMigration } from '../utils/storage'
 import { getToday } from '../utils/date'
@@ -149,43 +151,52 @@ export function App() {
 
   return (
     <div class="app">
-      <Header
-        currentDate={currentDate}
-        onDateChange={setCurrentDate}
-        onSettingsClick={() => setShowSettings(true)}
-        onCalendarClick={() => setShowCalendar(true)}
-        profileName={currentProfile?.name}
-        onProfileClick={handleProfileClick}
-      />
+      <OfflineIndicator />
+      <InstallPrompt />
 
-      <CoachingMessage
-        progress={progress}
-        profileName={currentProfile?.name}
-      />
+      <header role="banner">
+        <Header
+          currentDate={currentDate}
+          onDateChange={setCurrentDate}
+          onSettingsClick={() => setShowSettings(true)}
+          onCalendarClick={() => setShowCalendar(true)}
+          profileName={currentProfile?.name}
+          onProfileClick={handleProfileClick}
+        />
+      </header>
 
-      <DailyProgress
-        entries={entries}
-        goals={goals}
-        profileId={activeProfileId}
-        date={currentDate}
-        onCelebrationTrigger={handleCelebrationTrigger}
-      />
+      <main id="main-content" role="main">
+        <CoachingMessage
+          progress={progress}
+          profileName={currentProfile?.name}
+        />
 
-      <StreakDisplay
-        profileId={activeProfileId}
-        profile={currentProfile}
-        onDateClick={setCurrentDate}
-      />
+        <DailyProgress
+          entries={entries}
+          goals={goals}
+          profileId={activeProfileId}
+          date={currentDate}
+          onCelebrationTrigger={handleCelebrationTrigger}
+        />
 
-      <EntryList
-        entries={entries}
-        onEdit={handleEditEntry}
-        onDelete={setDeletingEntry}
-        profileId={activeProfileId}
-        onShowTemplates={() => setShowTemplates(true)}
-      />
+        <StreakDisplay
+          profileId={activeProfileId}
+          profile={currentProfile}
+          onDateClick={setCurrentDate}
+        />
 
-      <FAB onClick={() => setShowForm(true)} />
+        <EntryList
+          entries={entries}
+          onEdit={handleEditEntry}
+          onDelete={setDeletingEntry}
+          profileId={activeProfileId}
+          onShowTemplates={() => setShowTemplates(true)}
+        />
+      </main>
+
+      <nav role="navigation" aria-label="Quick actions">
+        <FAB onClick={() => setShowForm(true)} />
+      </nav>
 
       {showForm && (
         <EntryForm

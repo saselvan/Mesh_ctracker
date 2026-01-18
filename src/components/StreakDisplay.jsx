@@ -42,15 +42,29 @@ export function StreakDisplay({ profileId, profile, onDateClick }) {
         </div>
       </div>
 
+      {streakData.weeklyGoal && (
+        <div class="weekly-progress">
+          <span class="weekly-count">{streakData.weeklyProgress || 0}/{streakData.weeklyGoal}</span>
+          <span class="weekly-label">this week</span>
+        </div>
+      )}
+
       <div class="streak-calendar">
-        {days.map(day => (
-          <button
-            key={day.date}
-            class={`streak-dot streak-${day.status} ${day.isToday ? 'streak-today' : ''}`}
-            onClick={() => onDateClick?.(day.date)}
-            aria-label={`${day.date}: ${day.status}`}
-          />
-        ))}
+        <div class="calendar-day-labels">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+            <span key={i} class="day-label">{day}</span>
+          ))}
+        </div>
+        <div class="calendar-dots">
+          {days.map(day => (
+            <button
+              key={day.date}
+              class={`streak-dot streak-${day.status} ${day.isToday ? 'streak-today' : ''}`}
+              onClick={() => onDateClick?.(day.date)}
+              aria-label={`${day.date}: ${day.status}`}
+            />
+          ))}
+        </div>
       </div>
 
       {(streakData.milestones || []).length > 0 && (
@@ -61,11 +75,6 @@ export function StreakDisplay({ profileId, profile, onDateClick }) {
         </div>
       )}
 
-      {streakData.weeklyGoal && (
-        <div class="weekly-progress">
-          <span>{streakData.weeklyProgress || 0}/{streakData.weeklyGoal} this week</span>
-        </div>
-      )}
     </div>
   )
 }

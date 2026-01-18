@@ -12,8 +12,28 @@ export function EntryForm({ entry = null, onSave = () => {}, onCancel = () => {}
   const [mealType, setMealType] = useState(getSuggestedMealType())
   const [recentFoods, setRecentFoods] = useState([])
   const [showFavorites, setShowFavorites] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [touched, setTouched] = useState({})
 
   const isEditing = !!entry
+
+  const validate = () => {
+    const newErrors = {}
+    if (!name.trim()) {
+      newErrors.name = 'Food name is required'
+    }
+    if (calories === '' || calories === null) {
+      newErrors.calories = 'Calories is required'
+    } else if (parseInt(calories) < 0) {
+      newErrors.calories = 'Calories must be positive'
+    }
+    return newErrors
+  }
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }))
+    setErrors(validate())
+  }
 
   useEffect(() => {
     if (entry) {
@@ -55,7 +75,11 @@ export function EntryForm({ entry = null, onSave = () => {}, onCancel = () => {}
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!name.trim() || calories === '') return
+    const validationErrors = validate()
+    setErrors(validationErrors)
+    setTouched({ name: true, calories: true })
+
+    if (Object.keys(validationErrors).length > 0) return
 
     onSave({
       ...(entry || {}),
@@ -131,13 +155,18 @@ export function EntryForm({ entry = null, onSave = () => {}, onCancel = () => {}
             <input
               id="name"
               type="text"
-              class="form-input"
+              class={`form-input ${touched.name && errors.name ? 'form-input--error' : ''}`}
               value={name}
               onInput={e => setName(e.target.value)}
+              onBlur={() => handleBlur('name')}
               placeholder="e.g., Chicken Salad"
-              required
+              aria-invalid={touched.name && errors.name ? 'true' : 'false'}
+              aria-describedby={touched.name && errors.name ? 'name-error' : undefined}
               autoFocus
             />
+            {touched.name && errors.name && (
+              <span id="name-error" class="form-error" role="alert">{errors.name}</span>
+            )}
           </div>
 
         <div class="form-field">
@@ -145,14 +174,19 @@ export function EntryForm({ entry = null, onSave = () => {}, onCancel = () => {}
           <input
             id="calories"
             type="number"
-            class="form-input"
+            class={`form-input ${touched.calories && errors.calories ? 'form-input--error' : ''}`}
             value={calories}
             onInput={e => setCalories(e.target.value)}
+            onBlur={() => handleBlur('calories')}
             placeholder="0"
             min="0"
             step="1"
-            required
+            aria-invalid={touched.calories && errors.calories ? 'true' : 'false'}
+            aria-describedby={touched.calories && errors.calories ? 'calories-error' : undefined}
           />
+          {touched.calories && errors.calories && (
+            <span id="calories-error" class="form-error" role="alert">{errors.calories}</span>
+          )}
         </div>
 
         <div class="form-row">

@@ -7,7 +7,27 @@ export default defineConfig({
     preact(),
     VitePWA({
       registerType: 'autoUpdate',
-      manifest: false,
+      manifest: {
+        name: 'Calorie Tracker',
+        short_name: 'Calories',
+        description: 'Local-first calorie and macro tracking app',
+        start_url: './',
+        display: 'standalone',
+        background_color: '#FAF7F2',
+        theme_color: '#5C6B54',
+        icons: [
+          {
+            src: '/icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,jpg,svg}'],
         runtimeCaching: [

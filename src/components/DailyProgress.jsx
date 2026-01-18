@@ -90,6 +90,9 @@ export function DailyProgress({ entries = [], goals = DEFAULT_GOALS, profileId, 
             <span class="progress-value">{Math.round(totals.calories)}</span>
             <span class="progress-label">of {goals.calories} cal</span>
           </div>
+          <div aria-live="polite" class="sr-only">
+            {Math.round(totals.calories)} of {goals.calories} calories consumed
+          </div>
         </div>
       </div>
 

@@ -1,302 +1,95 @@
-# Tests: Accessibility & Inclusive Design
-
-id: T-022
-spec: S-022 (specs/22-accessibility.md)
-
----
-
-## Color Contrast Tests
-
-### Scenario: Text contrast meets WCAG AA
-
-**Given:** Light mode active
-**When:** I check --color-text on --color-background
-**Then:** Contrast ratio ≥ 4.5:1
-
-**Given:** Dark mode active
-**When:** I check --color-text on --color-background
-**Then:** Contrast ratio ≥ 4.5:1
-
-### Scenario: UI elements have sufficient contrast
-
-**Given:** App rendered
-**When:** I check button backgrounds
-**Then:** All buttons have 3:1 contrast minimum
-
----
-
-## Keyboard Navigation Tests
-
-### Scenario: Tab order is logical
-
-**Given:** App loaded, focus at top
-**When:** I press Tab repeatedly
-**Then:** Focus moves: Header → Progress → Entries → FAB
-**And:** Order matches visual layout
-
-### Scenario: All interactive elements focusable
-
-**Given:** App has entries
-**When:** I Tab through entire app
-**Then:** Every button, input, link receives focus
-**And:** No focus traps (except modals)
-
-### Scenario: Keyboard shortcuts work
-
-**Given:** No input focused
-**When:** I press "n"
-**Then:** Entry form opens
-
-**When:** I press ArrowLeft
-**Then:** Previous day shown
-
-**When:** I press Escape
-**Then:** Any open modal closes
-
----
-
-## Screen Reader Tests
-
-### Scenario: Progress ring announced correctly
-
-**Given:** Calories at 1500 of 2000
-**When:** Screen reader reads progress ring
-**Then:** Announces "Calorie progress: 1500 of 2000 calories"
-**And:** Has role="progressbar"
-**And:** aria-valuenow="75"
-
-### Scenario: Entry list has proper structure
-
-**Given:** 3 entries visible
-**When:** Screen reader reads entry list
-**Then:** Announces "Food entries for today, list, 3 items"
-**And:** Each entry is a list item
-
-### Scenario: Live region announces changes
-
-**Given:** User adds entry "Coffee"
-**When:** Entry saved
-**Then:** Screen reader announces "Added Coffee, 50 calories"
-
----
-
-## Focus Indicator Tests
-
-### Scenario: Focus visible on all elements
-
-**Given:** User navigating with keyboard
-**When:** Element receives focus
-**Then:** 2px outline visible
-**And:** Outline color is --color-sage
-**And:** Outline offset provides spacing
-
-### Scenario: Focus trapped in modals
-
-**Given:** Modal is open
-**When:** User Tabs past last element
-**Then:** Focus moves to first element in modal
-**And:** Focus cannot escape to background
-
----
-
-## Reduced Motion Tests
-
-### Scenario: Animations disabled
-
-**Given:** User prefers-reduced-motion
-**When:** App loads with entries
-**Then:** No stagger animation on cards
-**And:** Numbers update instantly
-**And:** Celebration dots static
-
----
-
-## Automated Tests
-
-```javascript
-// src/__tests__/accessibility.test.js
-import { axe, toHaveNoViolations } from 'jest-axe'
-import { render } from '@testing-library/preact'
-import { App } from '../components/App'
-
-expect.extend(toHaveNoViolations)
-
-describe('Accessibility', () => {
-  it('has no axe violations', async () => {
-    const { container } = render(<App />)
-    const results = await axe(container)
-    expect(results).toHaveNoViolations()
-  })
-})
-```
-
----
-
-## Unit Tests
-
-```javascript
-// src/utils/__tests__/focus-trap.test.js
-import { trapFocus } from '../focus-trap'
-
-describe('trapFocus', () => {
-  let container
-
-  beforeEach(() => {
-    container = document.createElement('div')
-    container.innerHTML = `
-      <button id="first">First</button>
-      <input id="middle" />
-      <button id="last">Last</button>
-    `
-    document.body.appendChild(container)
-  })
-
-  afterEach(() => {
-    document.body.removeChild(container)
-  })
-
-  it('focuses first element on init', () => {
-    trapFocus(container)
-    expect(document.activeElement.id).toBe('first')
-  })
-
-  it('wraps focus from last to first', () => {
-    trapFocus(container)
-    document.getElementById('last').focus()
-
-    const event = new KeyboardEvent('keydown', { key: 'Tab' })
-    container.dispatchEvent(event)
-
-    expect(document.activeElement.id).toBe('first')
-  })
-
-  it('wraps focus from first to last with shift+tab', () => {
-    trapFocus(container)
-    document.getElementById('first').focus()
-
-    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true })
-    container.dispatchEvent(event)
-
-    expect(document.activeElement.id).toBe('last')
-  })
-})
-```
-
----
-
-## Component Tests
-
-```javascript
-// src/components/__tests__/LiveRegion.test.jsx
-import { render } from '@testing-library/preact'
-import { LiveRegion } from '../LiveRegion'
-
-describe('LiveRegion', () => {
-  it('has correct ARIA attributes', () => {
-    const { container } = render(<LiveRegion message="Test" />)
-    const region = container.firstChild
-
-    expect(region.getAttribute('role')).toBe('status')
-    expect(region.getAttribute('aria-live')).toBe('polite')
-    expect(region.getAttribute('aria-atomic')).toBe('true')
-  })
-
-  it('is visually hidden but accessible', () => {
-    const { container } = render(<LiveRegion message="Test" />)
-    expect(container.querySelector('.sr-only')).toBeTruthy()
-  })
-
-  it('contains message text', () => {
-    const { getByText } = render(<LiveRegion message="Entry added" />)
-    expect(getByText('Entry added')).toBeTruthy()
-  })
-})
-
-// src/components/__tests__/SkipLinks.test.jsx
-import { render, fireEvent } from '@testing-library/preact'
-import { SkipLinks } from '../SkipLinks'
-
-describe('SkipLinks', () => {
-  it('renders skip to main content link', () => {
-    const { getByText } = render(<SkipLinks />)
-    expect(getByText('Skip to main content')).toBeTruthy()
-  })
-
-  it('links have correct hrefs', () => {
-    const { container } = render(<SkipLinks />)
-    const links = container.querySelectorAll('a')
-
-    expect(links[0].getAttribute('href')).toBe('#main-content')
-  })
-
-  it('becomes visible on focus', () => {
-    const { getByText } = render(<SkipLinks />)
-    const link = getByText('Skip to main content')
-
-    link.focus()
-
-    const styles = getComputedStyle(link)
-    expect(styles.top).not.toBe('-100%')
-  })
-})
-```
-
----
-
-## Touch Target Tests
-
-```javascript
-describe('Touch targets', () => {
-  it('buttons are at least 44px', () => {
-    const { container } = render(<App />)
-    const buttons = container.querySelectorAll('button')
-
-    buttons.forEach(btn => {
-      const rect = btn.getBoundingClientRect()
-      expect(rect.height).toBeGreaterThanOrEqual(44)
-      expect(rect.width).toBeGreaterThanOrEqual(44)
-    })
-  })
-})
-```
-
----
-
-## E2E Accessibility Tests
-
-```javascript
-// e2e/accessibility.spec.js
-import { injectAxe, checkA11y } from 'axe-playwright'
-
-test('home page is accessible', async ({ page }) => {
-  await page.goto('/')
-  await injectAxe(page)
-  await checkA11y(page)
-})
-
-test('keyboard navigation works', async ({ page }) => {
-  await page.goto('/')
-
-  // Tab to FAB
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Tab')
-
-  const fab = page.locator('.fab')
-  await expect(fab).toBeFocused()
-
-  // Press Enter to open form
-  await page.keyboard.press('Enter')
-  await expect(page.locator('.entry-form')).toBeVisible()
-
-  // Escape to close
-  await page.keyboard.press('Escape')
-  await expect(page.locator('.entry-form')).not.toBeVisible()
-})
-
-test('screen reader announces entry add', async ({ page }) => {
-  await page.goto('/')
-  // Add entry and verify live region updates
-  // This requires screen reader testing tools
-})
-```
+# T-022: Accessibility
+
+## Feature
+Comprehensive accessibility support: ARIA attributes, keyboard navigation, screen reader support, focus indicators
+
+## Test Steps
+
+### 1. Skip Link
+1. Load app, press Tab (first focus)
+2. Verify "Skip to content" link appears
+3. Press Enter
+4. Verify focus jumps to main content area (#main-content)
+
+### 2. Keyboard Navigation
+1. Unplug mouse (keyboard-only test)
+2. Tab through entire app:
+   - Header buttons (settings, calendar, profile)
+   - Daily progress (focusable if interactive)
+   - Entry list: Edit/delete buttons
+   - FAB (floating action button)
+3. Verify all interactive elements reachable via Tab
+4. Verify tab order is logical (top-to-bottom, left-to-right)
+5. Press Enter/Space on focused buttons → actions trigger
+6. Press Escape on modal → modal closes
+
+### 3. Focus Indicators
+1. Tab through app
+2. Verify all focused elements show visible outline:
+   - 2px solid outline in theme color
+   - outline-offset: 2px
+3. Click elements with mouse
+4. Verify NO outline on mouse click (focus-visible behavior)
+
+### 4. ARIA Attributes
+1. Inspect Modal component:
+   - role="dialog"
+   - aria-modal="true"
+   - aria-labelledby="modal-title"
+2. Inspect delete buttons in EntryList:
+   - aria-label="Delete {food name}"
+3. Inspect DailyProgress:
+   - aria-live="polite" region for calorie updates
+4. Inspect Celebration:
+   - role="status" aria-live="assertive"
+5. Run axe DevTools or WAVE extension
+6. Verify 0 critical ARIA errors
+
+### 5. Screen Reader Testing
+1. Enable VoiceOver (Mac: Cmd+F5) or NVDA (Windows)
+2. Navigate app with screen reader
+3. Verify announcements:
+   - Skip link announced
+   - Modal title announced on open
+   - Delete button announces "Delete {food}"
+   - DailyProgress announces calorie updates
+   - Celebration announces success message
+4. Verify semantic landmarks navigable (header, main, nav)
+
+### 6. Heading Hierarchy
+1. Install headingsMap browser extension or use axe DevTools
+2. Inspect heading outline:
+   - One h1: "Calorie Tracker"
+   - Multiple h2: "Settings", "Add Entry", etc.
+   - h3 under h2: "Daily Goals", "Notifications", meal groups
+3. Verify no skipped levels (e.g., h3 without h2)
+
+### 7. Lighthouse Audit
+1. Open DevTools → Lighthouse
+2. Run Accessibility audit
+3. Verify score ≥90
+
+### 8. Semantic HTML
+1. Inspect App.jsx DOM:
+   - <header role="banner">
+   - <main id="main-content" role="main">
+   - <nav role="navigation" aria-label="Quick actions">
+2. Verify landmarks present and correctly nested
+
+## Expected Results
+- Skip link functional
+- All features accessible via keyboard only
+- Focus indicators visible on keyboard focus, hidden on mouse click
+- ARIA attributes correct (dialog, aria-live, aria-label)
+- Screen reader announces dynamic content
+- Heading hierarchy correct (h1 → h2 → h3)
+- Lighthouse accessibility score ≥90
+
+## Pass Criteria
+✅ Skip link works
+✅ 100% keyboard navigable
+✅ Focus indicators visible (keyboard) and hidden (mouse)
+✅ axe/WAVE shows 0 critical errors
+✅ Screen reader announcements correct
+✅ Heading hierarchy valid
+✅ Lighthouse accessibility ≥90

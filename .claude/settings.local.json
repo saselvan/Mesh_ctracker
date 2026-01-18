@@ -24,7 +24,8 @@
       "Bash(docker exec:*)",
       "Bash(git fetch:*)",
       "Skill(superpowers:requesting-code-review)",
-      "Bash(docker cp:*)"
+      "Bash(docker cp:*)",
+      "WebSearch"
     ]
   }
 }

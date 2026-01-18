@@ -18,8 +18,14 @@ export function Modal({
 
   return (
     <div class="modal-overlay" onClick={onCancel}>
-      <div class="modal" onClick={e => e.stopPropagation()}>
-        <h3 class="modal-title">{title}</h3>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        onClick={e => e.stopPropagation()}
+      >
+        <h3 id="modal-title" class="modal-title">{title}</h3>
         <p class="modal-message">{message}</p>
         <div class="modal-actions">
           <button class="btn btn--secondary" onClick={onCancel}>

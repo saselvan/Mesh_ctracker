@@ -1,18 +1,13 @@
-import { useState, useEffect } from 'preact/hooks'
+import { useState } from 'preact/hooks'
+import { getThemePreference, setThemePreference } from '../utils/theme'
 
 export function ThemeToggle() {
-  const [preference, setPreference] = useState(() => {
-    return localStorage.getItem('theme-preference') || 'auto'
-  })
+  const [preference, setPreference] = useState(getThemePreference())
 
-  useEffect(() => {
-    localStorage.setItem('theme-preference', preference)
-
-    if (preference !== 'auto') {
-      const themeClass = preference === 'dark' ? 'theme-night' : 'theme-midday'
-      document.body.className = themeClass
-    }
-  }, [preference])
+  const handleChange = (value) => {
+    setPreference(value)
+    setThemePreference(value)
+  }
 
   return (
     <div style="margin-bottom: var(--space-4)">
@@ -20,7 +15,7 @@ export function ThemeToggle() {
       <select
         class="form-input"
         value={preference}
-        onChange={e => setPreference(e.target.value)}
+        onChange={e => handleChange(e.target.value)}
       >
         <option value="auto">Auto (time-based)</option>
         <option value="light">Light</option>

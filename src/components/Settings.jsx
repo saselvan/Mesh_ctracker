@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { exportAllData, importData } from '../utils/db'
 import { ProfileSettings } from './ProfileSettings'
+import { ThemeToggle } from './ThemeToggle'
 import { getProfiles } from '../utils/storage'
+import { requestPermission, getNotificationSettings, saveNotificationSettings } from '../utils/notifications'
 
 export function Settings({
   goals = {},
@@ -20,6 +22,11 @@ export function Settings({
 
   const profiles = getProfiles()
   const hasProfiles = profiles.length > 0
+
+  const [notifSettings, setNotifSettings] = useState(() => getNotificationSettings(activeProfileId))
+  const [permissionStatus, setPermissionStatus] = useState(() =>
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  )
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -76,6 +83,22 @@ export function Settings({
     onProfileChange(profileId)
   }
 
+  const handleEnableNotifications = async () => {
+    const result = await requestPermission()
+    setPermissionStatus(result)
+    if (result === 'granted') {
+      const newSettings = { ...notifSettings, enabled: true }
+      setNotifSettings(newSettings)
+      saveNotificationSettings(activeProfileId, newSettings)
+    }
+  }
+
+  const handleNotificationToggle = (enabled) => {
+    const newSettings = { ...notifSettings, enabled }
+    setNotifSettings(newSettings)
+    saveNotificationSettings(activeProfileId, newSettings)
+  }
+
   return (
     <div class="form-overlay" onClick={onClose}>
       <form class="entry-form" onClick={e => e.stopPropagation()} onSubmit={handleSubmit}>
@@ -100,6 +123,8 @@ export function Settings({
             />
           </div>
         )}
+
+        <ThemeToggle />
 
         <h3 class="form-section-title">Daily Goals</h3>
 
@@ -156,6 +181,31 @@ export function Settings({
             />
           </div>
         </div>
+
+        <h3 class="form-section-title">Notifications</h3>
+
+        {permissionStatus === 'unsupported' ? (
+          <p class="profile-hint">Notifications not supported in this browser.</p>
+        ) : permissionStatus === 'denied' ? (
+          <p class="profile-hint">Notifications blocked. Enable in browser settings.</p>
+        ) : notifSettings.enabled ? (
+          <div>
+            <div class="form-field">
+              <label class="form-label">
+                <input
+                  type="checkbox"
+                  checked={notifSettings.enabled}
+                  onChange={(e) => handleNotificationToggle(e.target.checked)}
+                />
+                Enable reminder notifications
+              </label>
+            </div>
+          </div>
+        ) : (
+          <button type="button" class="btn btn--secondary" onClick={handleEnableNotifications}>
+            Enable Notifications
+          </button>
+        )}
 
         <h3 class="form-section-title">Data</h3>
 
