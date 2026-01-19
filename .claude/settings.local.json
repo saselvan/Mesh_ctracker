@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:executing-plans)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git reset:*)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(git push:*)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(design)",
+      "Skill(frontend-design:frontend-design)",
+      "Bash(curl:*)",
+      "Bash(git config:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker exec confident_kapitsa bash -c \"cd /workspaces/calorie-tracker && cat /tmp/zeroshot-*/logs/*.log 2>/dev/null | tail -50\")",
+      "Bash(for c in confident_kapitsa upbeat_rhodes vibrant_zhukovsky tender_brattain)",
+      "Bash(do echo \"=== $c ===\" docker exec $c bash -c \"ls /workspaces 2>/dev/null || ls /home/node 2>/dev/null\")",
+      "Bash(done)",
+      "Bash(docker exec:*)",
+      "Bash(git fetch:*)",
+      "Skill(superpowers:requesting-code-review)",
+      "Bash(docker cp:*)",
+      "WebSearch"
+    ]
+  }
+}
