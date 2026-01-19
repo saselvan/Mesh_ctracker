@@ -1793,6 +1793,7 @@ body.theme-night::after {
   padding: var(--space-4);
   background: var(--color-sage-faint);
   border-radius: var(--radius-md);
+  overflow-x: auto;
 }
 
 .meal-btn {

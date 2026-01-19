@@ -184,7 +184,7 @@ export function ProfileSettings({ onProfileSelect, onClose, isPickerMode = false
                 class="form-input"
               />
               <div class="form-actions">
-                <button class="btn btn--secondary" onClick={() => setShowAddForm(false)}>
+                <button class="btn btn--secondary" onClick={() => profiles.length === 0 ? onClose() : setShowAddForm(false)}>
                   Cancel
                 </button>
                 <button class="btn btn--primary" onClick={handleAddProfile}>
