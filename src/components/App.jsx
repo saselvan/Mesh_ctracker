@@ -5,12 +5,12 @@ import { EntryList } from './EntryList'
 import { EntryForm } from './EntryForm'
 import { Settings } from './Settings'
 import { Modal } from './Modal'
-import { FAB } from './FAB'
+import { QuickAddButton } from './QuickAddButton'
+import { TodaySummary } from './TodaySummary'
 import { DatePicker } from './DatePicker'
 import { ProfileSettings } from './ProfileSettings'
 import { Celebration } from './Celebration'
 import { StreakDisplay } from './StreakDisplay'
-import { CoachingMessage } from './CoachingMessage'
 import { TemplateManager } from './TemplateManager'
 import { InstallPrompt } from './InstallPrompt'
 import { OfflineIndicator } from './OfflineIndicator'
@@ -20,6 +20,17 @@ import { getToday } from '../utils/date'
 import { checkAndUpdateStreak } from '../utils/streaks'
 import { applyTheme } from '../utils/theme'
 
+/**
+ * App - Log-First UI Design
+ *
+ * Layout order optimized for behavioral psychology:
+ * 1. QuickAddButton - Primary action (3-6x daily) at top
+ * 2. TodaySummary - Conditional feedback after logging
+ * 3. DailyProgress - Compact ring + horizontal macros
+ * 4. StreakDisplay - Collapsed motivational widget
+ *
+ * The most frequent action requires zero scrolling.
+ */
 export function App() {
   const [currentDate, setCurrentDate] = useState(getToday())
   const [entries, setEntries] = useState([])
@@ -34,10 +45,15 @@ export function App() {
   const [deletingEntry, setDeletingEntry] = useState(null)
   const [showCelebration, setShowCelebration] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showEntryList, setShowEntryList] = useState(false)
+  const [justLogged, setJustLogged] = useState(false)
 
   const profiles = getProfiles()
   const hasProfiles = profiles.length > 0
   const currentProfile = profiles.find(p => p.id === activeProfileId)
+
+  // Calculate totals for TodaySummary
+  const totalCalories = entries.reduce((sum, e) => sum + (e.calories || 0), 0)
 
   useEffect(() => {
     if (hasProfiles && !activeProfileId) {
@@ -53,7 +69,7 @@ export function App() {
 
   useEffect(() => {
     applyTheme()
-    const interval = setInterval(applyTheme, 15 * 60 * 1000) // Check every 15min
+    const interval = setInterval(applyTheme, 15 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
@@ -85,6 +101,10 @@ export function App() {
     await loadEntries()
     setShowForm(false)
     setEditingEntry(null)
+
+    // Trigger feedback animation
+    setJustLogged(true)
+    setTimeout(() => setJustLogged(false), 2500)
   }
 
   async function handleDeleteEntry() {
@@ -138,16 +158,9 @@ export function App() {
     }
     await loadEntries()
     setShowTemplates(false)
+    setJustLogged(true)
+    setTimeout(() => setJustLogged(false), 2500)
   }
-
-  // Calculate progress for coaching message
-  const totals = entries.reduce(
-    (acc, entry) => ({
-      calories: acc.calories + (entry.calories || 0)
-    }),
-    { calories: 0 }
-  )
-  const progress = goals.calories > 0 ? totals.calories / goals.calories : 0
 
   return (
     <div class="app">
@@ -166,37 +179,49 @@ export function App() {
       </header>
 
       <main id="main-content" role="main">
-        <CoachingMessage
-          progress={progress}
-          profileName={currentProfile?.name}
+        {/* PRIMARY ACTION - Log Meal Button */}
+        <QuickAddButton onClick={() => setShowForm(true)} />
+
+        {/* FEEDBACK - Today's Summary (conditional) */}
+        <TodaySummary
+          entries={entries}
+          totalCalories={totalCalories}
+          expanded={showEntryList}
+          onToggle={() => setShowEntryList(!showEntryList)}
+          justLogged={justLogged}
         />
 
+        {/* Expandable Entry List */}
+        {showEntryList && entries.length > 0 && (
+          <EntryList
+            entries={entries}
+            onEdit={handleEditEntry}
+            onDelete={setDeletingEntry}
+            profileId={activeProfileId}
+            onShowTemplates={() => setShowTemplates(true)}
+            compact
+          />
+        )}
+
+        {/* PROGRESS - Compact Ring + Horizontal Macros */}
         <DailyProgress
           entries={entries}
           goals={goals}
           profileId={activeProfileId}
           date={currentDate}
           onCelebrationTrigger={handleCelebrationTrigger}
+          justLogged={justLogged}
         />
 
+        {/* MOTIVATION - Collapsed Streak */}
         <StreakDisplay
           profileId={activeProfileId}
           profile={currentProfile}
           onDateClick={setCurrentDate}
         />
-
-        <EntryList
-          entries={entries}
-          onEdit={handleEditEntry}
-          onDelete={setDeletingEntry}
-          profileId={activeProfileId}
-          onShowTemplates={() => setShowTemplates(true)}
-        />
       </main>
 
-      <nav role="navigation" aria-label="Quick actions">
-        <FAB onClick={() => setShowForm(true)} />
-      </nav>
+      {/* No FAB - replaced by QuickAddButton at top */}
 
       {showForm && (
         <EntryForm

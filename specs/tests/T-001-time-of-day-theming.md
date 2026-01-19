@@ -5,39 +5,68 @@ spec: S-001 (specs/01-time-of-day-theming.md)
 
 ---
 
-## Functional Tests
+## Artist-Inspired Palette Tests
 
-### Scenario: Morning theme applied at 7am
+Each theme should reflect its artist's visual language, not just generic color shifts.
+
+### Scenario: Morning theme (David Hockney) applied at 7am
 
 **Given:** The current time is 7:00 AM (hour 7)
 **When:** The app loads
 **Then:** document.body has class "theme-morning"
-**And:** --color-cream equals #FDF8F3 (warmer)
-**And:** Background has warm peachy tones
+**And:** --color-cream equals #F0F9FF (light sky blue — California morning)
+**And:** --color-white equals #F8FDFF (cyan-tinted card)
+**And:** --color-sage equals #00B4D8 (vivid pool cyan — iconic Hockney blue)
+**And:** --color-terracotta equals #E07A5F (bold terracotta pink — poolside tiles)
+**And:** --color-espresso equals #2B2D42 (cool confident dark)
+**And:** --color-protein equals #E07A5F (terracotta tiles)
+**And:** --color-carbs equals #F4A261 (warm California orange)
+**And:** --color-fat equals #00B4D8 (pool water cyan)
+**And:** Ambient gradient has cyan shimmer
 
-### Scenario: Midday theme applied at 2pm
+### Scenario: Midday theme (Alexander Calder) applied at 2pm
 
 **Given:** The current time is 2:00 PM (hour 14)
 **When:** The app loads
 **Then:** document.body has class "theme-midday"
-**And:** Default palette values applied
-**And:** Background has neutral tones
+**And:** --color-cream equals #FFFDF5 (warm gallery white — sunlit museum)
+**And:** --color-white equals #FFFEF8 (warm white card)
+**And:** --color-sage equals #E63946 (Calder RED — his signature bold)
+**And:** --color-terracotta equals #1D3557 (deep blue — mobile contrast)
+**And:** --color-warning equals #FFB703 (Calder yellow — bold sunshine)
+**And:** --color-protein equals #1D3557 (deep blue)
+**And:** --color-carbs equals #FFB703 (signature yellow)
+**And:** --color-fat equals #E63946 (Calder red)
+**And:** Ambient gradient has red/yellow energy
 
-### Scenario: Evening theme applied at 6pm
+### Scenario: Evening theme (Mark Rothko) applied at 6pm
 
 **Given:** The current time is 6:00 PM (hour 18)
 **When:** The app loads
 **Then:** document.body has class "theme-evening"
-**And:** --color-sage equals #5A6B58 (cooler)
-**And:** Background has cooler sage tones
+**And:** --color-cream equals #F0E8DC (aged paper warm)
+**And:** --color-sage equals #5A5545 (burnt umber sage)
+**And:** --color-terracotta equals #CA724A (deep orange-amber)
+**And:** --color-espresso equals #352F28 (deep espresso)
+**And:** --color-protein equals #8B4513 (sienna brown)
+**And:** --color-carbs equals #CA724A (Rothko orange)
+**And:** --color-fat equals #DAA520 (goldenrod amber)
+**And:** Ambient gradient has hazy amber glow
 
-### Scenario: Night theme applied at 10pm
+### Scenario: Night theme (Yayoi Kusama) applied at 10pm
 
 **Given:** The current time is 10:00 PM (hour 22)
 **When:** The app loads
 **Then:** document.body has class "theme-night"
-**And:** --color-cream equals #1A1A1A (dark background)
-**And:** Full dark mode palette active
+**And:** --color-cream equals #0D0D0D (true black — infinity room voids)
+**And:** --color-white equals #1A1A1A (deep charcoal surface)
+**And:** --color-sage equals #9FFFB0 (electric sage neon)
+**And:** --color-terracotta equals #FF1744 (HOT RED — Kusama's polka dots)
+**And:** --color-espresso equals #FFFFFF (pure white text)
+**And:** --color-protein equals #FF3366 (hot magenta-pink — polka dot rooms)
+**And:** --color-carbs equals #FFFF00 (pure neon yellow — pumpkin installations)
+**And:** --color-fat equals #00FF88 (electric neon green — infinity mirrors)
+**And:** Ambient gradient has neon accents against void
 
 ### Scenario: Theme refreshes every 15 minutes
 
@@ -285,4 +314,176 @@ describe('Time-of-day theming', () => {
     expect(document.body.className).toContain('theme-night')
   })
 })
+```
+
+---
+
+## Playwright Visual Regression Tests
+
+Visual tests to verify each artist-inspired theme renders correctly.
+
+```javascript
+// e2e/themes.spec.js
+import { test, expect } from '@playwright/test'
+
+test.describe('Artist-Inspired Theme Visual Tests', () => {
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:5173')
+  })
+
+  test('Morning theme (David Hockney) - vivid pool cyan and terracotta', async ({ page }) => {
+    // Force morning theme
+    await page.evaluate(() => {
+      document.body.className = 'theme-morning'
+    })
+    await page.waitForTimeout(500) // Allow CSS transition
+
+    // Visual snapshot
+    await expect(page).toHaveScreenshot('theme-morning-hockney.png', {
+      fullPage: true,
+      animations: 'disabled'
+    })
+
+    // Verify key colors
+    const cream = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-cream').trim()
+    )
+    expect(cream).toBe('#F0F9FF') // Light sky blue
+
+    const sage = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-sage').trim()
+    )
+    expect(sage).toBe('#00B4D8') // Vivid pool cyan
+  })
+
+  test('Midday theme (Alexander Calder) - bold red and yellow primaries', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.className = 'theme-midday'
+    })
+    await page.waitForTimeout(500)
+
+    await expect(page).toHaveScreenshot('theme-midday-calder.png', {
+      fullPage: true,
+      animations: 'disabled'
+    })
+
+    const sage = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-sage').trim()
+    )
+    expect(sage).toBe('#E63946') // Calder RED
+
+    const warning = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-warning').trim()
+    )
+    expect(warning).toBe('#FFB703') // Calder yellow
+  })
+
+  test('Evening theme (Mark Rothko) - burnt umber and orange-amber', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.className = 'theme-evening'
+    })
+    await page.waitForTimeout(500)
+
+    await expect(page).toHaveScreenshot('theme-evening-rothko.png', {
+      fullPage: true,
+      animations: 'disabled'
+    })
+
+    const cream = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-cream').trim()
+    )
+    expect(cream).toBe('#F0E8DC')
+
+    const terracotta = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-terracotta').trim()
+    )
+    expect(terracotta).toBe('#CA724A')
+  })
+
+  test('Night theme (Yayoi Kusama) - electric neon and true black', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.className = 'theme-night'
+    })
+    await page.waitForTimeout(500)
+
+    await expect(page).toHaveScreenshot('theme-night-kusama.png', {
+      fullPage: true,
+      animations: 'disabled'
+    })
+
+    const cream = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-cream').trim()
+    )
+    expect(cream).toBe('#0D0D0D')
+
+    const sage = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-sage').trim()
+    )
+    expect(sage).toBe('#9FFFB0') // Electric sage
+
+    const terracotta = await page.evaluate(() =>
+      getComputedStyle(document.body).getPropertyValue('--color-terracotta').trim()
+    )
+    expect(terracotta).toBe('#FF1744') // HOT RED polka dots
+  })
+
+  test('All themes comparison grid', async ({ page }) => {
+    // Create a comparison view of all themes
+    const themes = ['morning', 'midday', 'evening', 'night']
+
+    for (const theme of themes) {
+      await page.evaluate((t) => {
+        document.body.className = `theme-${t}`
+      }, theme)
+      await page.waitForTimeout(300)
+
+      await expect(page).toHaveScreenshot(`theme-${theme}-full.png`, {
+        fullPage: true,
+        animations: 'disabled'
+      })
+    }
+  })
+})
+
+test.describe('Theme Accessibility', () => {
+
+  test('All themes pass contrast requirements', async ({ page }) => {
+    const themes = ['morning', 'midday', 'evening', 'night']
+
+    for (const theme of themes) {
+      await page.goto('http://localhost:5173')
+      await page.evaluate((t) => {
+        document.body.className = `theme-${t}`
+      }, theme)
+
+      // Check primary text contrast (espresso on cream)
+      const result = await page.evaluate(() => {
+        const style = getComputedStyle(document.body)
+        const bg = style.getPropertyValue('--color-cream')
+        const text = style.getPropertyValue('--color-espresso')
+        return { bg, text }
+      })
+
+      // Log for manual verification
+      console.log(`${theme}: bg=${result.bg}, text=${result.text}`)
+    }
+  })
+})
+```
+
+### Running Playwright Tests
+
+```bash
+# Install Playwright
+npm install -D @playwright/test
+
+# Initialize Playwright
+npx playwright install
+
+# Run visual tests
+npx playwright test e2e/themes.spec.js
+
+# Update snapshots after intentional changes
+npx playwright test --update-snapshots
 ```

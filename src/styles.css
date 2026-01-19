@@ -78,7 +78,7 @@
   /* Motion */
   --duration-fast: 150ms;
   --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-slow: 350ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -127,59 +127,142 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 400;
-  background: var(--color-cream);
+  background: transparent;
   color: var(--color-espresso);
   line-height: var(--leading-relaxed);
   letter-spacing: var(--tracking-normal);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 2s ease-in-out, color 2s ease-in-out;
+  transition: color 2s ease-in-out;
 }
 
-/* Time-of-Day Theme Overrides */
+html {
+  min-height: 100%;
+  background: #888;  /* Neutral gray - will be overridden by theme */
+}
+
+/* ============================================
+   ARTIST-INSPIRED TIME-OF-DAY THEMES
+   Each time period has a distinct artistic personality
+   ============================================ */
+
+/* MORNING — Georgia O'Keeffe
+   Desert dawn, soft adobe colors, luminous but gentle
+   Warm awakening, like watching sunrise over Ghost Ranch */
+html:has(body.theme-morning) { background: #D0A088; }  /* Mid coral */
 .theme-morning {
-  --color-cream: #FDF8F3;
-  --color-sage: #6B7A62;
-  --color-terracotta: #D4896B;
+  --color-cream: #FFF8F0;           /* Warm desert dawn */
+  --color-white: #FFFCF8;           /* Luminous white */
+  --color-sage: #7BA393;            /* Desert sage — more saturated */
+  --color-sage-light: #9DBCAD;
+  --color-sage-pale: #E0EDE6;
+  --color-sage-faint: #F0F6F3;
+  --color-terracotta: #E8A080;      /* Soft adobe coral */
+  --color-terracotta-light: #F0BDA8;
+  --color-terracotta-pale: #FCF0E8;
+  --color-espresso: #4A4038;        /* Warm earth */
+  --color-warm-gray: #7A7068;
+  --color-muted: #A09890;
+  --color-success: #7BA393;         /* Desert sage */
+  --color-warning: #F0C090;         /* Desert gold */
+  /* Macro rings — O'Keeffe's desert palette */
+  --color-protein: #E8A080;         /* Adobe coral */
+  --color-carbs: #E8C878;           /* Desert marigold */
+  --color-fat: #7BA393;             /* Sage green */
 }
 
+/* MIDDAY — Alexander Calder
+   Bold mobiles — primary colors, playful confidence
+   Peak energy, bold contrasts, decisive action */
+html:has(body.theme-midday) { background: #D0A840; }  /* Mid yellow-ochre */
 .theme-midday {
-  /* Uses default :root palette - no overrides needed */
+  --color-cream: #FFFDF5;           /* Warm gallery white — sunlit museum */
+  --color-white: #FFFEF8;           /* Warm white card — gallery paper */
+  --color-sage: #E87070;            /* Softened coral (was #E63946) */
+  --color-sage-light: #F09090;
+  --color-sage-pale: #FDF0F0;
+  --color-sage-faint: #FEF8F8;
+  --color-terracotta: #3D5A7A;      /* Softened slate blue (was #1D3557) */
+  --color-terracotta-light: #5D7A9A;
+  --color-terracotta-pale: #EDF1F5;
+  --color-espresso: #2A2A2A;        /* Softened dark */
+  --color-warm-gray: #5A5A5A;
+  --color-muted: #8A8A8A;
+  --color-success: #3AAD9F;         /* Softened teal */
+  --color-warning: #FFCC66;         /* Softer golden amber (was #FFB703) */
+  /* Macro rings — Softened Calder primaries */
+  --color-protein: #3D5A7A;         /* Softened blue */
+  --color-carbs: #FFCC66;           /* Softer golden */
+  --color-fat: #E87070;             /* Softened coral */
 }
 
+/* EVENING — James Turrell
+   Light installations, ganzfeld effect, twilight glow
+   Ethereal wind-down, soft purple-lavender, dreamy */
+html:has(body.theme-evening) { background: #A08898; }  /* Mid mauve */
 .theme-evening {
-  --color-cream: #F5F5F0;
-  --color-sage: #5A6B58;
-  --color-terracotta: #B8776A;
+  --color-cream: #E8E0F0;           /* Soft lavender twilight */
+  --color-white: #F0EBF5;           /* Light violet white */
+  --color-sage: #7B6B9E;            /* Twilight purple */
+  --color-sage-light: #9A8BB8;
+  --color-sage-pale: #E0D8EB;
+  --color-sage-faint: #F0ECF5;
+  --color-terracotta: #E8A87C;      /* Warm horizon glow */
+  --color-terracotta-light: #F0C4A0;
+  --color-terracotta-pale: #F8EEE5;
+  --color-espresso: #3D3655;        /* Deep twilight */
+  --color-warm-gray: #605878;
+  --color-muted: #8A82A0;
+  --color-success: #88A0B8;         /* Cool sky blue */
+  --color-warning: #E8B888;         /* Horizon orange */
+  /* Macro rings — Turrell's twilight spectrum */
+  --color-protein: #C87888;         /* Dusky rose */
+  --color-carbs: #E8B078;           /* Warm amber glow */
+  --color-fat: #88A0C0;             /* Twilight blue */
 }
 
+/* NIGHT — Yayoi Kusama
+   Infinity rooms, bold dots in darkness, high drama
+   Bold, infinite, unapologetic contrast */
+html:has(body.theme-night) { background: #341820; }  /* Mid dark magenta */
 .theme-night {
-  --color-cream: #1A1A1A;
-  --color-white: #252525;
-  --color-sage: #B8D4B0;
-  --color-sage-light: #C8E4C0;
-  --color-sage-pale: #3A4238;
-  --color-sage-faint: #2A2E28;
-  --color-terracotta: #F0A888;
-  --color-terracotta-light: #F8C0A8;
-  --color-terracotta-pale: #3A3030;
-  --color-espresso: #FAFAFA;
-  --color-warm-gray: #D8D8D8;
+  --color-cream: #0D0D0D;           /* True black — infinity room voids */
+  --color-white: #1A1A1A;           /* Deep charcoal — surfaces */
+  --color-sage: #00FF88;            /* VIVID neon green — infinity mirrors */
+  --color-sage-light: #66FFAA;
+  --color-sage-pale: #0A2A1A;
+  --color-sage-faint: #051510;
+  --color-terracotta: #FF1744;      /* HOT RED — Kusama's polka dots, eye-searing */
+  --color-terracotta-light: #FF5252;
+  --color-terracotta-pale: #2A1A18;
+  --color-espresso: #FFFFFF;        /* Pure white — text */
+  --color-warm-gray: #E0E0E0;
   --color-muted: #A0A0A0;
-  --color-success: #8FA785;
-  --color-warning: #D9B07F;
-  --color-protein: #A08A70;
-  --color-carbs: #D4B26E;
-  --color-fat: #C4A38E;
+  --color-success: #00FF88;         /* VIVID neon green for success */
+  --color-warning: #FFB080;
+  /* Macro rings — Kusama's infinity room neons, VIVID */
+  --color-protein: #FF3366;         /* Hot magenta-pink — polka dot rooms */
+  --color-carbs: #FFFF00;           /* Pure neon yellow — pumpkin installations */
+  --color-fat: #00FF88;             /* Electric neon green — infinity mirrors */
+  /* Night shadows — lighter for visibility on dark backgrounds */
+  --shadow-sm: 0 1px 3px rgba(255,255,255,0.08);
+  --shadow-md: 0 4px 16px rgba(255,255,255,0.12);
+  --shadow-lg: 0 8px 32px rgba(255,255,255,0.16);
+  --shadow-glow: 0 0 40px rgba(0,255,136,0.4);  /* Neon green glow */
 }
 
-/* Rothko-inspired ambient backgrounds */
+/* ============================================
+   ARTIST-INSPIRED AMBIENT BACKGROUNDS
+   Each time period has its own atmospheric quality
+   ============================================ */
+
+/* Default ambient (Calder-style clean backdrop) */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at 30% 20%, rgba(139, 157, 130, 0.15) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 30% 20%, rgba(92, 139, 84, 0.12) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
 }
@@ -188,22 +271,85 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at 70% 80%, rgba(200, 120, 100, 0.1) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 70% 80%, rgba(193, 123, 95, 0.1) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
 }
 
-/* Time-responsive Rothko palettes */
+/* MORNING — O'Keeffe palette (True Fuzzy - 14% transitions)
+   Low-contrast warm tones blend smoothly with moderate gaps */
 body.theme-morning::before {
-  background: radial-gradient(ellipse at 30% 20%, rgba(255, 200, 150, 0.15) 0%, transparent 50%);
+  background: linear-gradient(180deg,
+    #FFF8F0 0%,
+    #FFF8F0 18%,          /* Cream field */
+    #E8C878 32%,          /* 14% transition */
+    #E8C878 43%,          /* Gold field */
+    #E8A080 57%,          /* 14% transition */
+    #E8A080 68%,          /* Coral field */
+    #7BA393 82%,          /* 14% transition */
+    #7BA393 100%          /* Sage field */
+  );
+  opacity: 0.8;
+}
+body.theme-morning::after {
+  background: none;
 }
 
+/* MIDDAY — Calder palette (Extra Fuzzy - 20% transitions)
+   High-contrast primaries need wider gaps to avoid banding */
+body.theme-midday::before {
+  background: linear-gradient(180deg,
+    #FFFDF5 0%,
+    #FFFDF5 15%,          /* Cream field */
+    #E87070 35%,          /* Softened coral-red (was #E63946) */
+    #E87070 40%,          /* Coral field */
+    #FFCC66 60%,          /* Softer golden amber (was #FFB703) */
+    #FFCC66 65%,          /* Golden field */
+    #3D5A7A 85%,          /* Softened slate blue (was #1D3557) */
+    #3D5A7A 100%          /* Slate field */
+  );
+  opacity: 0.65;          /* Slightly reduced intensity */
+}
+body.theme-midday::after {
+  background: none;
+}
+
+/* EVENING — Turrell palette (Extra Fuzzy - 20% transitions)
+   High-contrast twilight needs wider gaps for smooth glow */
 body.theme-evening::before {
-  background: radial-gradient(ellipse at 30% 20%, rgba(100, 120, 140, 0.15) 0%, transparent 50%);
+  background: linear-gradient(180deg,
+    #E8E0F0 0%,
+    #E8E0F0 15%,          /* Lavender field */
+    #7B6B9E 35%,          /* 20% transition */
+    #7B6B9E 40%,          /* Purple field */
+    #E8A87C 60%,          /* 20% transition */
+    #E8A87C 65%,          /* Warm glow field */
+    #607088 85%,          /* 20% transition */
+    #607088 100%          /* Twilight blue field */
+  );
+  opacity: 0.8;
+}
+body.theme-evening::after {
+  background: none;
 }
 
+/* NIGHT — Kusama palette (True Fuzzy - 14% transitions)
+   Low-contrast dark values blend smoothly with moderate gaps */
 body.theme-night::before {
-  background: radial-gradient(ellipse at 30% 20%, rgba(50, 50, 80, 0.2) 0%, transparent 50%);
+  background: linear-gradient(180deg,
+    #0D0D0D 0%,
+    #0D0D0D 18%,          /* Black field */
+    #401830 32%,          /* 14% transition */
+    #401830 43%,          /* Magenta field */
+    #383820 57%,          /* 14% transition */
+    #383820 68%,          /* Olive field */
+    #1A281A 82%,          /* 14% transition */
+    #1A281A 100%          /* Green field */
+  );
+  opacity: 0.9;
+}
+body.theme-night::after {
+  background: none;
 }
 
 #app {
@@ -232,7 +378,7 @@ body.theme-night::before {
    ============================================ */
 
 .header {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
   transition: color 2s ease-in-out;
 }
 
@@ -350,14 +496,22 @@ body.theme-night::before {
    ============================================ */
 
 .progress-card {
-  background: var(--color-white);
+  position: relative;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
-  margin-bottom: var(--space-6);
-  position: relative;
+  margin-bottom: var(--space-5);
   overflow: hidden;
-  transition: background-color 2s ease-in-out, border-color 2s ease-in-out;
+  transition: background-color 2s ease-in-out, border-color 2s ease-in-out, box-shadow 2s ease-in-out;
+}
+
+.theme-night .progress-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .progress-card::after {
@@ -377,7 +531,7 @@ body.theme-night::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
   position: relative;
 }
 
@@ -649,16 +803,26 @@ body.theme-night::before {
 }
 
 .entry-card {
-  background: var(--color-white);
+  position: relative;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-lg);
   padding: var(--space-6); /* More padding on cards */
   margin-bottom: var(--space-3);
   box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast), background-color 2s ease-in-out, border-color 2s ease-in-out;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto;
   gap: var(--space-1) var(--space-3);
   align-items: center;
+}
+
+.theme-night .entry-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform var(--duration-fast), box-shadow var(--duration-fast), background-color 2s ease-in-out;
 }
 
@@ -1000,7 +1164,7 @@ body.theme-night::before {
 .modal-message {
   font-size: 0.9375rem;
   color: var(--color-warm-gray);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
   line-height: 1.5;
 }
 
@@ -1342,10 +1506,19 @@ body.theme-night::before {
    ============================================ */
 
 .streak-display {
+  position: relative;
   padding: var(--space-4);
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+.theme-night .streak-display {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .streak-stats {
@@ -1381,6 +1554,41 @@ body.theme-night::before {
 
 .streak-calendar {
   margin-bottom: var(--space-4);
+  /* Frosted glass inner container for better contrast against gradients */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+/* Theme-specific calendar containers that harmonize with gradients */
+
+/* Morning (O'Keeffe): Warm sage-cream complements peachy-green gradient */
+.theme-morning .streak-calendar {
+  background: rgba(123, 163, 147, 0.25);  /* Sage-tinted */
+  border-color: rgba(123, 163, 147, 0.35);
+}
+
+/* Midday (Calder): Soft peachy-cream - warm but not overwhelming */
+.theme-midday .streak-calendar {
+  background: rgba(255, 245, 230, 0.7);  /* Soft cream with peach undertone */
+  border-color: rgba(255, 220, 180, 0.6);
+}
+
+/* Evening (Turrell): Solid warm coral to block blue bleed-through */
+.theme-evening .streak-calendar {
+  background: rgb(225, 195, 190);  /* Solid warm dusty rose - no transparency */
+  border-color: rgba(200, 170, 165, 0.9);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Night (Kusama): Dark container for dark gradient */
+.theme-night .streak-calendar {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .calendar-day-labels {
@@ -1393,31 +1601,44 @@ body.theme-night::before {
 .day-label {
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  color: var(--color-muted);
+  color: var(--color-espresso);
   text-align: center;
+  opacity: 0.7;
+}
+
+.theme-night .day-label {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .calendar-dots {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .streak-dot {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: none;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* Base border for visibility against any background */
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.theme-night .streak-dot {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .streak-dot:hover {
   transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .streak-dot:active {
@@ -1426,20 +1647,44 @@ body.theme-night::before {
 
 .streak-success {
   background: var(--color-sage);
+  border-color: var(--color-sage-light);
 }
 
 .streak-missed {
-  background: var(--color-muted);
-  opacity: 0.3;
+  /* Use semi-transparent color instead of opacity for better visibility */
+  background: rgba(128, 128, 128, 0.4);
+  border-color: rgba(128, 128, 128, 0.5);
+}
+
+.theme-night .streak-missed {
+  background: rgba(80, 80, 80, 0.6);
+  border-color: rgba(100, 100, 100, 0.5);
 }
 
 .streak-pending {
   background: var(--color-sage);
-  opacity: 0.5;
+  opacity: 0.6;
+  border-color: var(--color-sage-light);
 }
 
 .streak-today {
-  box-shadow: 0 0 0 2px var(--color-terracotta);
+  box-shadow: 0 0 0 3px var(--color-terracotta), 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-terracotta);
+}
+
+/* Night mode: Kusama infinity room glow on streak dots */
+.theme-night .streak-success {
+  border-color: var(--color-sage);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6), 0 0 16px rgba(0, 255, 136, 0.3), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.theme-night .streak-pending {
+  border-color: var(--color-sage);
+  box-shadow: 0 0 6px rgba(0, 255, 136, 0.3), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.theme-night .streak-today {
+  box-shadow: 0 0 0 3px var(--color-terracotta), 0 0 12px rgba(255, 23, 68, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .milestone-badges {
@@ -1492,7 +1737,11 @@ body.theme-night::before {
    ============================================ */
 
 .coaching-message {
-  background: linear-gradient(135deg, var(--color-sage-faint), var(--color-cream));
+  position: relative;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: var(--space-4);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-4);
@@ -1500,6 +1749,11 @@ body.theme-night::before {
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-3);
+}
+
+.theme-night .coaching-message {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .coaching-message p {
@@ -1577,18 +1831,27 @@ body.theme-night::before {
 
 /* Meal Groups */
 .meal-group {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .meal-group-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-3) var(--space-4);
-  background: var(--color-sage-faint);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-3);
   font-family: var(--font-display);
+}
+
+.theme-night .meal-group-header {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(159, 255, 176, 0.1);
   font-size: var(--text-base);
   letter-spacing: var(--tracking-tight);
   color: var(--color-sage);
@@ -1928,3 +2191,424 @@ body.theme-night::before {
   background: var(--color-terracotta);
   transform: scale(1.1);
 }
+
+/* ============================================
+   LOG-FIRST UI REDESIGN
+   Behavioral psychology-driven layout
+   ============================================ */
+
+/* Quick Add Button - Primary CTA (Glassmorphism)
+   Becomes a window INTO the Rothko gradient rather than a block on top */
+.quick-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 68px;
+  margin-bottom: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+
+  /* Glassmorphism - lets gradient show through */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.quick-add-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.quick-add-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.quick-add-icon {
+  font-size: 2rem;
+}
+
+.quick-add-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-espresso);
+  letter-spacing: var(--tracking-tight);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Night theme - invert for dark background */
+.theme-night .quick-add-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.theme-night .quick-add-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.theme-night .quick-add-text {
+  color: var(--color-espresso);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Today Summary - Conditional Feedback */
+.today-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  font-family: var(--font-body);
+}
+
+.today-summary:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.today-summary-text {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-espresso);
+}
+
+.today-summary-arrow {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  transition: transform var(--duration-fast);
+}
+
+.today-summary-arrow--up {
+  transform: rotate(180deg);
+}
+
+.today-summary-check {
+  font-size: var(--text-lg);
+  color: var(--color-success);
+  animation: checkPop 0.3s ease-out;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Confirmation state with green pulse */
+.today-summary--confirmed {
+  background: rgba(123, 163, 147, 0.2);
+  border-color: var(--color-sage);
+  animation: confirmPulse 0.6s ease-out;
+}
+
+@keyframes confirmPulse {
+  0% { box-shadow: 0 0 0 0 rgba(123, 163, 147, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(123, 163, 147, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(123, 163, 147, 0); }
+}
+
+.theme-night .today-summary {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-night .today-summary:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-night .today-summary-text {
+  color: var(--color-espresso);
+}
+
+.theme-night .today-summary--confirmed {
+  background: rgba(159, 255, 176, 0.1);
+  border-color: var(--color-sage);
+}
+
+/* Compact Progress Card */
+.progress-card--compact {
+  padding: var(--space-4);
+}
+
+.progress-compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+/* Compact Ring - 120px */
+.progress-ring--compact {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  animation: none; /* Remove float animation for compact */
+}
+
+.progress-ring--compact svg {
+  transform: rotate(-90deg);
+}
+
+.progress-ring--compact .progress-ring-bg {
+  stroke-width: 10;
+}
+
+.progress-ring--compact .progress-ring-fill {
+  stroke-width: 10;
+}
+
+.progress-value--compact {
+  font-size: var(--text-xl);
+}
+
+.progress-label--compact {
+  font-size: 0.625rem;
+}
+
+/* Pulse animation when meal logged */
+.progress-card--pulse {
+  animation: cardPulse 0.6s ease-out;
+}
+
+@keyframes cardPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Horizontal Macro Bars */
+.macro-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.macro-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.macro-bar-label {
+  width: 20px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-warm-gray);
+}
+
+.macro-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-sage-pale);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.macro-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.macro-bar-fill--protein {
+  background: var(--color-protein);
+}
+
+.macro-bar-fill--carbs {
+  background: var(--color-carbs);
+}
+
+.macro-bar-fill--fat {
+  background: var(--color-fat);
+}
+
+.macro-bar-value {
+  width: 45px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-warm-gray);
+  text-align: right;
+}
+
+/* Collapsible Streak Display */
+.streak-display--collapsible {
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+}
+
+.streak-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  font-family: var(--font-body);
+}
+
+.streak-collapsed:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.streak-collapsed-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.streak-fire {
+  font-size: 1.25rem;
+}
+
+.streak-count {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-espresso);
+}
+
+.streak-expand-arrow {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  transition: transform var(--duration-fast);
+}
+
+.streak-expand-arrow--up {
+  transform: rotate(180deg);
+}
+
+.theme-night .streak-collapsed {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-night .streak-collapsed:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-night .streak-count {
+  color: var(--color-espresso);
+}
+
+/* Expanded Streak View */
+.streak-expanded {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  animation: expandIn 0.2s ease-out;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-night .streak-expanded {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Evening: Warm coral container to prevent blue bleed-through */
+.theme-evening .streak-expanded {
+  background: rgba(232, 180, 160, 0.4);
+  border: 1px solid rgba(232, 180, 160, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.streak-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--space-4);
+}
+
+.streak-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.streak-stat-number {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-sage);
+  line-height: 1;
+}
+
+/* Improve stat number contrast for lighter themes */
+.theme-morning .streak-stat-number {
+  color: #4A7A6A;  /* Darker sage for better contrast */
+}
+
+.theme-midday .streak-stat-number {
+  color: #C85050;  /* Darker coral for better contrast */
+}
+
+.streak-stat-label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-top: var(--space-1);
+}
+
+/* Hide FAB - replaced by QuickAddButton */
+.fab {
+  display: none;
+}
+
+/* Compact Entry List (when expanded from TodaySummary) */
+.entry-list[compact] .entry-card,
+.entry-list .entry-card {
+  padding: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+/* Note: Streak expansion is handled by React conditional rendering
+   in StreakDisplay.jsx via useState(false) - no CSS display control needed */
+

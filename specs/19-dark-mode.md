@@ -1,7 +1,7 @@
 # Spec: Dark Mode Theme
 
 **Phase:** 6 - Polish & Accessibility
-**Artist Influence:** Rothko (luminous darks, color relationships)
+**Artist Influence:** Yayoi Kusama (infinity rooms, neon against darkness)
 **Priority:** Medium
 **Estimated Effort:** Medium
 
@@ -9,51 +9,67 @@
 
 ## Overview
 
-Implement a dark mode theme that maintains the Warm Wellness aesthetic. Dark mode should feel cozy and restful, not cold and stark. Inspired by Rothko's dark period paintings where colors glow from within darkness.
+Implement a dark mode theme inspired by Yayoi Kusama's infinity rooms—bold, unapologetic contrast with electric neon accents against true black voids. Unlike generic dark modes that simply invert colors, this theme should feel dramatic and intentional, with colors that POP rather than fade.
+
+> **Note:** This spec aligns with the Night theme (Kusama) from S-001 Time-of-Day Theming.
+> When user selects "Dark" mode manually, it applies the same Kusama palette as the automatic night theme.
 
 ## Requirements
 
-### Color Palette — Dark Mode
+### Color Palette — Kusama Dark Mode
 
 ```css
-:root[data-theme="dark"] {
-  /* Backgrounds — warm darks, not pure black */
-  --color-background: #1A1917;        /* Warm charcoal */
-  --color-surface: #252422;           /* Elevated surface */
-  --color-surface-raised: #2D2B28;    /* Cards, modals */
+/* NIGHT — Yayoi Kusama
+   Infinity rooms, bold dots in darkness, high drama
+   Bold, infinite, unapologetic contrast */
+.theme-night {
+  /* Backgrounds — true black, infinity room voids */
+  --color-cream: #0D0D0D;             /* True black background */
+  --color-white: #1A1A1A;             /* Deep charcoal surfaces */
 
-  /* Cream becomes muted warm */
-  --color-cream: #1A1917;
+  /* Primary — Electric neon sage (like her neon installations) */
+  --color-sage: #9FFFB0;              /* Electric sage — POPS */
+  --color-sage-light: #B8FFC8;
+  --color-sage-pale: #1A2A1E;         /* Dark sage surface */
+  --color-sage-faint: #0F1A12;
 
-  /* Sage adjusts for dark background */
-  --color-sage: #8BA382;              /* Lightened for contrast */
-  --color-sage-light: #6B7D64;
-  --color-sage-pale: #2A2F28;         /* Very dark sage */
+  /* Accent — Hot coral (Kusama's vivid red dots) */
+  --color-terracotta: #FF7A5C;        /* Hot coral — vivid */
+  --color-terracotta-light: #FF9A80;
+  --color-terracotta-pale: #2A1A18;
 
-  /* Terracotta glows in dark */
-  --color-terracotta: #D4896E;        /* Lightened */
-  --color-terracotta-light: #C17B5F;
+  /* Text — Pure white for maximum contrast */
+  --color-espresso: #FFFFFF;          /* Pure white text */
+  --color-warm-gray: #E0E0E0;
+  --color-muted: #A0A0A0;
 
-  /* Text hierarchy */
-  --color-text: #F5F2ED;              /* Warm white */
-  --color-text-secondary: #A8A299;    /* Muted */
-  --color-muted: #7A756D;
+  /* Semantic colors — neon variants */
+  --color-success: #9FFFB0;           /* Electric sage */
+  --color-warning: #FFB080;           /* Warm coral */
 
-  /* Borders and dividers */
-  --color-border: #3D3A36;
-  --color-divider: #2D2B28;
+  /* Macro colors — visible against black */
+  --color-protein: #C4B4A0;
+  --color-carbs: #E8D090;
+  --color-fat: #D4A488;
 
-  /* Macro colors — slightly desaturated for dark mode */
-  --color-protein: #A89580;
-  --color-carbs: #D4BC70;
-  --color-fat: #C09E8F;
-
-  /* Shadows — more subtle in dark mode */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  /* Shadows — subtle glow effects */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 20px rgba(159, 255, 176, 0.15);
 }
 ```
+
+### Design Philosophy
+
+Unlike traditional dark modes that simply desaturate and invert:
+
+| Generic Dark Mode | Kusama-Inspired |
+|-------------------|-----------------|
+| Dark gray backgrounds | True black (#0D0D0D) |
+| Muted, desaturated colors | Electric neon accents |
+| Reduced contrast | High contrast, bold |
+| Colors fade into darkness | Colors POP against void |
 
 ### Theme Toggle
 
@@ -162,39 +178,48 @@ export function ThemeToggle() {
 }
 ```
 
-### Rothko-Inspired Dark Backgrounds
+### Kusama-Inspired Dark Effects
 
 ```css
-/* Dark mode gradient backgrounds */
-:root[data-theme="dark"] .progress-card {
-  background: linear-gradient(
-    180deg,
-    #252422 0%,
-    #1E1D1B 100%
+/* Infinity room ambient gradients */
+body.theme-night::before {
+  background: radial-gradient(
+    ellipse at 25% 25%,
+    rgba(159, 255, 176, 0.08) 0%,    /* Electric sage glow */
+    transparent 45%
   );
 }
 
-:root[data-theme="dark"] .header {
-  background: linear-gradient(
-    180deg,
-    #1A1917 0%,
-    rgba(26, 25, 23, 0.95) 100%
+body.theme-night::after {
+  background: radial-gradient(
+    ellipse at 75% 75%,
+    rgba(255, 122, 92, 0.08) 0%,     /* Hot coral glow */
+    transparent 45%
   );
 }
 
-/* Rothko glow effect on rings */
-:root[data-theme="dark"] .progress-ring-fill {
-  filter: drop-shadow(0 0 8px currentColor);
+/* Neon glow effects on interactive elements */
+.theme-night .progress-ring-fill {
+  filter: drop-shadow(0 0 12px currentColor);
 }
 
-:root[data-theme="dark"] .streak-dot {
-  box-shadow: 0 0 6px var(--color-terracotta);
+.theme-night .btn--primary {
+  box-shadow: 0 0 20px rgba(159, 255, 176, 0.3);
+}
+
+.theme-night .streak-dot {
+  box-shadow: 0 0 8px var(--color-terracotta);
+}
+
+/* Kusama dots should POP, not fade */
+.theme-night .kusama-dot {
+  box-shadow: 0 0 16px currentColor;
 }
 ```
 
 ### Time-of-Day + Dark Mode
 
-Combine with Turrell-inspired time theming from S-001:
+Combine with artist-inspired time theming from S-001:
 
 > **Note:** Time boundaries must align with S-001 (Time-of-Day Theming).
 > Use `getTimeOfDay()` from S-001 for consistency.
@@ -260,22 +285,28 @@ function ThemeSettings() {
 }
 ```
 
-### Celebration Colors in Dark Mode
+### Celebration Colors in Dark Mode (Kusama)
 
 ```css
-:root[data-theme="dark"] {
-  /* Celebration dots glow more in dark */
-  --celebration-terracotta: #E5957A;
-  --celebration-sage: #9DB894;
-  --celebration-gold: #E5C86A;
+.theme-night {
+  /* Celebration dots glow brightly — Kusama's vivid dots */
+  --celebration-terracotta: #FF7A5C;  /* Hot coral */
+  --celebration-sage: #9FFFB0;        /* Electric sage */
+  --celebration-gold: #FFD080;        /* Warm gold */
 }
 
-:root[data-theme="dark"] .kusama-dot {
-  box-shadow: 0 0 12px currentColor;
+.theme-night .kusama-dot {
+  box-shadow: 0 0 16px currentColor;  /* Strong neon glow */
+  animation: kusama-pulse 2s ease-in-out infinite;
 }
 
-:root[data-theme="dark"] .celebration-message {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+@keyframes kusama-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.9; }
+}
+
+.theme-night .celebration-message {
+  text-shadow: 0 0 30px rgba(159, 255, 176, 0.3);
 }
 ```
 
